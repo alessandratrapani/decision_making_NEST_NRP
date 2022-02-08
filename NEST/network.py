@@ -2,6 +2,7 @@ import numpy
 import time
 import matplotlib.pyplot as plt
 import os
+import shutil
 import sys 
 import nest
 import nest.raster_plot
@@ -9,7 +10,8 @@ import pandas as pd
 
 nest.ResetKernel()
 startbuild = time.time()
-#'''#-------------------------------------------------------------------------------
+#'''
+#'''**********************************************************************************
 def LambertWm1(x):
     return nest.ll_api.sli_func('LambertWm1', float(x))
 
@@ -20,18 +22,21 @@ def ComputePSPNorm(tau_mem, C_mem, tau_syn):
     return (numpy.exp(1.0) / (tau_syn * (C_mem * b) * 
             ((numpy.exp( -t_max / tau_mem) - numpy.exp(-t_max / tau_syn)) / b - 
             t_max * numpy.exp(-t_max / tau_syn))))
-#'''#-------------------------------------------------------------------------------
+#'''
+#'''**********************************************************************************
 parameters = pd.read_csv('parameters.csv')
 dt = 0.1   # the resolution in ms
 simtime = 3000.0  # Simulation time in ms
-coherence = 1.
+coherence = 0.8
 
-notes = 'NMDA_recurrent_weight_wplus'
-#'''#-------------------------------------------------------------------------------
+notes = 'ratiostim_delayI_c08'
+#'''
+#'''**********************************************************************************
 
 nest.SetKernelStatus({"resolution": dt, "print_time": True, "overwrite_files": True})
 
-#'''#-------------------------------------------------------------------------------
+#'''
+#'''**********************************************************************************
 order = 200
 NA = 2 * order  # number of excitatory neurons in pop A
 NB = 2 * order  # number of excitatory neurons in pop B
@@ -67,7 +72,8 @@ pop_B = nest.Create("iaf_psc_exp_multisynapse", NB)
 nest.SetDefaults("iaf_psc_exp_multisynapse", inh_neuron_params)
 pop_inh = nest.Create("iaf_psc_exp_multisynapse", NI)
 
-#'''#-------------------------------------------------------------------------------
+#'''
+#'''**********************************************************************************
 
 J = parameters['J'][0]  # mV -> this means that it takes 200 simultaneous events to drive the spiking activity 
 
@@ -87,7 +93,8 @@ print("AMPA: %f" % J_norm_AMPA)
 print("NMDA: %f" % J_norm_NMDA)  
 print("GABA: %f" % J_norm_GABA)
 
-#'''#-------------------------------------------------------------------------------
+#'''
+#'''**********************************************************************************
 
 nu_th_noise_ex = (numpy.abs(parameters['V_threshold'][0]) * parameters['C_m_ex'][0]) / (J_norm_noise * numpy.exp(1) * parameters['tau_m_ex'][0] * parameters['tau_syn_noise'][0])
 nu_ex = parameters['eta_ex'][0] * nu_th_noise_ex
@@ -109,7 +116,8 @@ p_rate_stimulus_B = (p_rate_stimulus) * (1-coherence)
 
 print("p_rate_stimulus: %f" % p_rate_stimulus)
 
-#'''#-------------------------------------------------------------------------------
+#'''
+#'''**********************************************************************************
 
 nest.SetDefaults("poisson_generator", {"rate": p_rate_ex})    #poisson generator for the noise in input to popA and popB
 PG_noise_to_ex = nest.Create("poisson_generator")
@@ -118,17 +126,18 @@ nest.SetDefaults("poisson_generator", {"rate": p_rate_in})   #poisson generator 
 PG_noise_to_inh = nest.Create("poisson_generator")
 
 
-nest.SetDefaults("poisson_generator", {"rate": p_rate_stimulus_A, "origin": 0.0, "start":200.0, "stop":1000.0} )   #poisson generator for the input to popA
+nest.SetDefaults("poisson_generator", {"rate": p_rate_stimulus_A, "origin": 0.0, "start":parameters['start_stim'][0], "stop":parameters['end_stim'][0]} )   #poisson generator for the input to popA
 PG_input_NMDA_A = nest.Create("poisson_generator")
-nest.SetDefaults("poisson_generator", {"rate": p_rate_stimulus_A, "origin": 0.0, "start":200.0, "stop":1000.0} )   #poisson generator for the input to popA
+nest.SetDefaults("poisson_generator", {"rate": p_rate_stimulus_A, "origin": 0.0, "start":parameters['start_stim'][0], "stop":parameters['end_stim'][0]} )   #poisson generator for the input to popA
 PG_input_AMPA_A = nest.Create("poisson_generator")
 
-nest.SetDefaults("poisson_generator", {"rate": p_rate_stimulus_B, "origin": 0.0, "start":200.0, "stop":1000.0} )   #poisson generator for the input to popB
+nest.SetDefaults("poisson_generator", {"rate": p_rate_stimulus_B, "origin": 0.0, "start":parameters['start_stim'][0], "stop":parameters['end_stim'][0]} )   #poisson generator for the input to popB
 PG_input_NMDA_B = nest.Create("poisson_generator")
-nest.SetDefaults("poisson_generator", {"rate": p_rate_stimulus_B, "origin": 0.0, "start":200.0, "stop":1000.0} )   #poisson generator for the input to popB
+nest.SetDefaults("poisson_generator", {"rate": p_rate_stimulus_B, "origin": 0.0, "start":parameters['start_stim'][0], "stop":parameters['end_stim'][0]} )   #poisson generator for the input to popB
 PG_input_AMPA_B = nest.Create("poisson_generator")
 
-#'''#-------------------------------------------------------------------------------
+#'''
+#'''**********************************************************************************
 
 spikes_a = nest.Create("spike_detector")
 spikes_b = nest.Create("spike_detector")
@@ -149,7 +158,8 @@ nest.SetStatus(spikes_i, [{"label": "Inhibitory population ",
                           "withgid": True,
                           "to_file": True}])
 
-#'''#-------------------------------------------------------------------------------
+#'''
+#'''**********************************************************************************
 
 # Definition of synapses
 nest.CopyModel("static_synapse", "noise_syn",
@@ -202,7 +212,8 @@ nest.CopyModel("static_synapse", "inhibitory_recurrent",
 GABA_recurrent_syn = {"model": "inhibitory_recurrent",
                  "receptor_type": 4} 
 
-#'''#-------------------------------------------------------------------------------
+#'''
+#'''**********************************************************************************
 
 #Connecting device
 
@@ -221,7 +232,8 @@ nest.Connect(pop_A, spikes_a)
 nest.Connect(pop_B, spikes_b)
 nest.Connect(pop_inh, spikes_i)
 
-#'''#-------------------------------------------------------------------------------
+#'''
+#'''**********************************************************************************
 
 #Connecting populations
 conn_params_ex_AB_BA = {'rule': 'pairwise_bernoulli', 'p':parameters['epsilon_ex_AB_BA'][0]}
@@ -230,7 +242,7 @@ conn_params_ex_AI_BI = {'rule': 'pairwise_bernoulli', 'p':parameters['epsilon_ex
 conn_params_in_IA_IB = {'rule': 'pairwise_bernoulli', 'p':parameters['epsilon_in_IA_IB'][0]}
 conn_params_in_recurrent = {'rule': 'pairwise_bernoulli', 'p':parameters['epsilon_in_recurrent'][0]}
 
-#'''#-------------------------------------------------------------------------------
+
 
 # pop A
 # Recurrent
@@ -243,8 +255,6 @@ nest.Connect(pop_A, pop_B, conn_params_ex_AB_BA, NMDA_AB_BA_syn)
 nest.Connect(pop_A, pop_inh, conn_params_ex_AI_BI, AMPA_AI_BI_syn)
 nest.Connect(pop_A, pop_inh, conn_params_ex_AI_BI, NMDA_AI_BI_syn)
 
-#'''#-------------------------------------------------------------------------------
-
 # pop B
 # Recurrent
 nest.Connect(pop_B, pop_B, conn_params_ex_reccurent, AMPA_recurrent_syn)
@@ -256,8 +266,6 @@ nest.Connect(pop_B, pop_A, conn_params_ex_AB_BA, NMDA_AB_BA_syn)
 nest.Connect(pop_B, pop_inh, conn_params_ex_AI_BI, AMPA_AI_BI_syn)
 nest.Connect(pop_B, pop_inh, conn_params_ex_AI_BI, NMDA_AI_BI_syn)
 
-#'''#-------------------------------------------------------------------------------
-
 # pop inhib
 # Recurrent
 nest.Connect(pop_inh, pop_inh, conn_params_in_recurrent, GABA_recurrent_syn)
@@ -266,7 +274,8 @@ nest.Connect(pop_inh, pop_A, conn_params_in_IA_IB, GABA_IA_IB_syn)
 # To pop B
 nest.Connect(pop_inh, pop_B, conn_params_in_IA_IB, GABA_IA_IB_syn)
 
-#'''#-------------------------------------------------------------------------------
+#'''
+#'''**********************************************************************************
 
 endbuild = time.time() # Storage of the time point after the buildup of the network in a variable.
 print("Simulating")
@@ -299,12 +308,18 @@ print("Excitatory events A  : %.2f" % events_ex_a)
 print("Excitatory events B  : %.2f" % events_ex_b)
 print("Inhibitory events : %.2f" % events_in)
 
-nest.raster_plot.from_device(spikes_a, hist=True)
-nest.raster_plot.from_device(spikes_b, hist=True)
-nest.raster_plot.from_device(spikes_i, hist=True)
-plt.show()
+saving_dir = 'results/'+notes+'/'
+if not os.path.exists(saving_dir):
+    os.makedirs(saving_dir)
+current_path = os.getcwd()+'/'
+shutil.copy(current_path+'parameters.csv',current_path+saving_dir+'parameters.csv')
 
-#'''#-------------------------------------------------------------------------------
+nest.raster_plot.from_device(spikes_a, hist=True)
+plt.savefig(saving_dir+'PopA_'+notes+'png')
+nest.raster_plot.from_device(spikes_b, hist=True)
+plt.savefig(saving_dir+'PopB_'+notes+'png')
+nest.raster_plot.from_device(spikes_i, hist=True)
+#plt.show()
 
 events_a = nest.GetStatus(spikes_a,"events")
 df = pd.DataFrame(events_a)
@@ -314,7 +329,7 @@ senders = senders.T
 times = times.T
 PopA = pd.concat([senders,times],axis = 1)
 PopA.columns =['Senders', 'Time']
-PopA.to_csv('results/PopA_'+notes+'.csv', index = False, float_format = '%.2f')
+PopA.to_csv(saving_dir+'PopA_'+notes+'.csv', index = False, float_format = '%.2f')
 
 events_B = nest.GetStatus(spikes_b,"events")
 df_B = pd.DataFrame(events_B)
@@ -324,7 +339,7 @@ senders_B = senders_B.T
 times_B = times_B.T
 PopB = pd.concat([senders_B,times_B],axis = 1)
 PopB.columns =['Senders', 'Time']
-PopB.to_csv('results/PopB_'+notes+'.csv', index = False, float_format = '%.2f')
+PopB.to_csv(saving_dir+'PopB_'+notes+'.csv', index = False, float_format = '%.2f')
 
 events_i = nest.GetStatus(spikes_i,"events")
 df_i = pd.DataFrame(events_i)
@@ -334,4 +349,5 @@ senders_i = senders_i.T
 times_i = times_i.T
 PopI = pd.concat([senders_i,times_i],axis = 1)
 PopI.columns =['Senders', 'Time']
-PopI.to_csv('results/PopI_'+notes+'.csv', index = False, float_format = '%.2f')
+PopI.to_csv(saving_dir+'PopI_'+notes+'.csv', index = False, float_format = '%.2f')
+#'''
