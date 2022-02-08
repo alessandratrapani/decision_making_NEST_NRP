@@ -29,7 +29,7 @@ dt = 0.1   # the resolution in ms
 simtime = 3000.0  # Simulation time in ms
 coherence = 0.8
 
-notes = 'ratiostim_delayI_c08'
+notes = 'ratiostim_delayNMDA_c1'
 #'''
 #'''**********************************************************************************
 
@@ -168,47 +168,47 @@ noise_syn = {"model": "noise_syn",
                  "receptor_type": 1}
 
 nest.CopyModel("static_synapse", "excitatory_AMPA_input",
-               {"weight": J_norm_AMPA, "delay": parameters['delay_noise'][0]})
+               {"weight": J_norm_AMPA, "delay": parameters['delay_AMPA'][0]})
 AMPA_input_syn = {"model": "excitatory_AMPA_input",
                  "receptor_type": 2} 
 nest.CopyModel("static_synapse", "excitatory_NMDA_input",
-               {"weight": J_norm_NMDA, "delay": parameters['delay_noise'][0]})
+               {"weight": J_norm_NMDA, "delay": parameters['delay_NMDA'][0]})
 NMDA_input_syn = {"model": "excitatory_NMDA_input",
                  "receptor_type": 3}                              
 
 nest.CopyModel("static_synapse", "excitatory_AMPA_AB_BA",
-               {"weight": J_norm_AMPA*parameters['w_minus'][0], "delay": parameters['delay_ex_AB_BA'][0]})
+               {"weight": J_norm_AMPA*parameters['w_minus'][0], "delay": parameters['delay_AMPA'][0]})
 AMPA_AB_BA_syn = {"model": "excitatory_AMPA_AB_BA",
                  "receptor_type": 2}
 nest.CopyModel("static_synapse", "excitatory_NMDA_AB_BA",
-               {"weight": J_norm_NMDA*parameters['w_minus'][0], "delay": parameters['delay_ex_AB_BA'][0]})
+               {"weight": J_norm_NMDA*parameters['w_minus'][0], "delay": parameters['delay_NMDA'][0]})
 NMDA_AB_BA_syn = {"model": "excitatory_NMDA_AB_BA",
                  "receptor_type": 3}               
 
 nest.CopyModel("static_synapse", "excitatory_AMPA_AI_BI",
-              {"weight": J_norm_AMPA*parameters['w_plus'][0], "delay": parameters['delay_ex_AI_BI'][0]})
+              {"weight": J_norm_AMPA*parameters['w_plus'][0], "delay": parameters['delay_AMPA'][0]})
 AMPA_AI_BI_syn = {"model": "excitatory_AMPA_AI_BI",
                  "receptor_type": 2}                  
 nest.CopyModel("static_synapse", "excitatory_NMDA_AI_BI",
-               {"weight": J_norm_NMDA*parameters['w_plus'][0], "delay": parameters['delay_ex_AI_BI'][0]})
+               {"weight": J_norm_NMDA*parameters['w_plus'][0], "delay": parameters['delay_NMDA'][0]})
 NMDA_AI_BI_syn = {"model": "excitatory_NMDA_AI_BI",
                  "receptor_type": 3}  
 
 nest.CopyModel("static_synapse", "inhibitory_IA_IB",
-               {"weight": -J_norm_GABA*parameters['w_plus'][0], "delay": parameters['delay_in_IA_IB'][0]})
+               {"weight": -J_norm_GABA*parameters['w_plus'][0], "delay": parameters['delay_GABA'][0]})
 GABA_IA_IB_syn = {"model": "inhibitory_IA_IB",
                  "receptor_type": 4} 
 
 nest.CopyModel("static_synapse", "excitatory_AMPA_recurrent",
-              {"weight": J_norm_AMPA, "delay": parameters['delay_ex_reccurent'][0]})
+              {"weight": J_norm_AMPA, "delay": parameters['delay_AMPA'][0]})
 AMPA_recurrent_syn = {"model": "excitatory_AMPA_recurrent",
                  "receptor_type": 2}    
 nest.CopyModel("static_synapse", "excitatory_NMDA_recurrent",
-              {"weight": J_norm_NMDA*parameters['w_plus'][0]*2.5, "delay": parameters['delay_ex_reccurent'][0]})
+              {"weight": J_norm_NMDA*parameters['w_plus'][0]*2.5, "delay": parameters['delay_NMDA'][0]})
 NMDA_recurrent_syn = {"model": "excitatory_NMDA_recurrent",
                  "receptor_type": 3} 
 nest.CopyModel("static_synapse", "inhibitory_recurrent",
-               {"weight": -J_norm_GABA, "delay": parameters['delay_in_recurrent'][0]})
+               {"weight": -J_norm_GABA, "delay": parameters['delay_GABA'][0]})
 GABA_recurrent_syn = {"model": "inhibitory_recurrent",
                  "receptor_type": 4} 
 
