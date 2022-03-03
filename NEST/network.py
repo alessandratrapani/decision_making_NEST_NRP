@@ -27,9 +27,9 @@ def ComputePSPNorm(tau_mem, C_mem, tau_syn):
 parameters = pd.read_csv('parameters.csv')
 dt = 0.1   # the resolution in ms
 simtime = 3000.0  # Simulation time in ms
-coherence = 0.8
+coherence = 0.128
 
-notes = 'ratiostim_delayNMDA_c1'
+notes = 'diffcompstim_c128'
 #'''
 #'''**********************************************************************************
 
@@ -111,8 +111,8 @@ print("p_rate_ex: %f" % p_rate_ex)
 print("p_rate_in: %f" % p_rate_in)
 
 p_rate_stimulus=  p_rate_ex / parameters['ratio_stim_rate'][0]   #rate for the input Poisson generator to popA (scaled with respect to the noise)
-p_rate_stimulus_A = (p_rate_stimulus) * coherence
-p_rate_stimulus_B = (p_rate_stimulus) * (1-coherence)
+p_rate_stimulus_A = (p_rate_stimulus) * (1 + coherence)
+p_rate_stimulus_B = (p_rate_stimulus) * (1 - coherence)
 
 print("p_rate_stimulus: %f" % p_rate_stimulus)
 
