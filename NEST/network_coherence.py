@@ -26,15 +26,15 @@ def ComputePSPNorm(tau_mem, C_mem, tau_syn):
     t_max = 1.0 / b * (-LambertWm1(-np.exp(-1.0/a)/a) - 1.0 / a)
     return (np.exp(1.0) / (tau_syn * (C_mem * b) * 
             ((np.exp( -t_max / tau_mem) - np.exp(-t_max / tau_syn)) / b - 
-            t_max * np.exp(-t_max / tau_syn))))
+            t_max * np.exp(-t_max / tau_syn)))) 
 #'''
 #'''**********************************************************************************
 parameters = pd.read_csv('parameters.csv')
 simtime = 3000.0  # Simulation time in ms
 stimulus_update_interval = 50
-coherence = 80
+coherence = 51.2
 
-notes = 'gaussian_stim'
+notes = 'gs_stim+noise_c0512'
 #'''
 #'''**********************************************************************************
 
@@ -144,10 +144,10 @@ p_rate_in = 1000.0 * nu_in
 print("p_rate_ex: %f" % p_rate_ex)
 print("p_rate_in: %f" % p_rate_in)
 
-nest.SetDefaults("poisson_generator", {"rate": p_rate_ex})    #poisson generator for the noise in input to popA and popB
+#nest.SetDefaults("poisson_generator", {"rate": p_rate_ex})    #poisson generator for the noise in input to popA and popB
 PG_noise_to_ex = nest.Create("poisson_generator")
 
-nest.SetDefaults("poisson_generator", {"rate": p_rate_in})   #poisson generator for the noise in input to popinh
+#nest.SetDefaults("poisson_generator", {"rate": p_rate_in})   #poisson generator for the noise in input to popinh
 PG_noise_to_inh = nest.Create("poisson_generator")
 
 nest.CopyModel("static_synapse", "noise_syn",
@@ -185,11 +185,16 @@ nest.Connect(PG_input_AMPA_B, pop_B, syn_spec=AMPA_input_syn)
 nest.Connect(PG_input_NMDA_B, pop_B, syn_spec=NMDA_input_syn)
 
 # Define the stimulus: two PoissonInput with time-dependent mean.
-mean_p_rate_stimulus=  p_rate_ex / parameters['ratio_stim_rate'][0]   #rate for the input Poisson generator to popA (scaled with respect to the noise)
+mean_p_rate_stimulus=  p_rate_ex / 100.#parameters['ratio_stim_rate'][0]   #rate for the input Poisson generator to popA (scaled with respect to the noise)
 std_p_rate_stimulus = mean_p_rate_stimulus / 8
 
 def update_poisson_stimulus(t):
-    if t >= parameters['Start_stim'][0] and t < parameters['End_stim'][0]:
+    rate_exc = np.random.normal(p_rate_ex, p_rate_ex/100)
+    rate_inh = np.random.normal(p_rate_in, p_rate_ex/100)
+    nest.SetStatus(PG_noise_to_ex, "rate", rate_exc)
+    nest.SetStatus(PG_noise_to_inh, "rate", rate_inh)
+
+    if t >= parameters['start_stim'][0] and t < parameters['end_stim'][0]:
         offset_A = mean_p_rate_stimulus * (0.5 + (0.5 * coherence))
         offset_B = mean_p_rate_stimulus * (0.5 - (0.5 * coherence))
 
@@ -197,7 +202,7 @@ def update_poisson_stimulus(t):
         rate_A = (max(0., rate_A)) #no negative rate
         rate_B = np.random.normal(offset_B, std_p_rate_stimulus)
         rate_B = (max(0., rate_B)) #no negative rate
-
+        
         nest.SetStatus(PG_input_AMPA_A, "rate", rate_A)
         nest.SetStatus(PG_input_NMDA_A, "rate", rate_A)
         nest.SetStatus(PG_input_AMPA_B, "rate", rate_B)
