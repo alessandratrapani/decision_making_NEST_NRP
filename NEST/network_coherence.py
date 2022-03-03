@@ -31,10 +31,10 @@ def ComputePSPNorm(tau_mem, C_mem, tau_syn):
 #'''**********************************************************************************
 parameters = pd.read_csv('parameters.csv')
 simtime = 3000.0  # Simulation time in ms
-stimulus_update_interval = 50
-coherence = 51.2
+stimulus_update_interval = 25
+coherence = 0.
 
-notes = 'gs_stim+noise_c0512'
+notes = 'order400_c0'
 #'''
 #'''**********************************************************************************
 
@@ -42,7 +42,7 @@ nest.SetKernelStatus({"resolution": dt, "print_time": True, "overwrite_files": T
 
 #'''
 #'''**********************************************************************************
-order = 200
+order = 400
 NA = 2 * order  # number of excitatory neurons in pop A
 NB = 2 * order  # number of excitatory neurons in pop B
 NI = 1 * order  # number of inhibitory neurons
@@ -185,7 +185,7 @@ nest.Connect(PG_input_AMPA_B, pop_B, syn_spec=AMPA_input_syn)
 nest.Connect(PG_input_NMDA_B, pop_B, syn_spec=NMDA_input_syn)
 
 # Define the stimulus: two PoissonInput with time-dependent mean.
-mean_p_rate_stimulus=  p_rate_ex / 100.#parameters['ratio_stim_rate'][0]   #rate for the input Poisson generator to popA (scaled with respect to the noise)
+mean_p_rate_stimulus=  p_rate_ex / 260.#parameters['ratio_stim_rate'][0]   #rate for the input Poisson generator to popA (scaled with respect to the noise)
 std_p_rate_stimulus = mean_p_rate_stimulus / 8
 
 def update_poisson_stimulus(t):
