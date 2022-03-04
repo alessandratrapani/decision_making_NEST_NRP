@@ -12,8 +12,8 @@ dt_rec = 10.0
 nest.SetKernelStatus({"resolution": dt, "print_time": True, "overwrite_files": True})
 t0 = nest.GetKernelStatus('time')
 
-notes = 'o400_c512_'
-coherence = 51.2
+notes = 'o400_c0_'
+coherence = 0.0
 order = 400
 simtime = 3000.0
 start_stim = 500.0
@@ -32,7 +32,7 @@ ax_raster = None
 ax_rate = None
 fig, (ax_raster, ax_rate) = plt.subplots(2, 1, sharex=True, figsize=(10,5))
 
-plt.suptitle('Coherence ' + str(coherence) + '%')
+plt.suptitle('Coherence ' + str(coherence*100) + '%')
 
 evsA = smA["events"]["senders"]
 tsA = smA["events"]["times"]
@@ -69,6 +69,6 @@ ax_rate.legend()
 plt.xlabel("t [ms]")
 
 plt.show()
-
+#TODO save results correctly
 results = pd.DataFrame(results)
 results.to_csv(notes+'results.csv')

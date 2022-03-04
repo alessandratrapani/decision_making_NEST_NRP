@@ -172,7 +172,7 @@ def simulate_network(coherence = 51.2, order = 400, start_stim = 500.0, end_stim
 
     # Define the stimulus: two PoissonInput with time-dependent mean.
     mean_p_rate_stimulus=  p_rate_ex / tuned_par['ratio_stim_rate'][0]   #rate for the input Poisson generator to popA (scaled with respect to the noise)
-    std_p_rate_stimulus = mean_p_rate_stimulus / 8
+    std_p_rate_stimulus = mean_p_rate_stimulus / tuned_par['std_ratio'][0]
 
     def update_poisson_stimulus(t):
         rate_exc = np.random.normal(p_rate_ex, p_rate_ex/100)
