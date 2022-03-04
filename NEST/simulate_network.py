@@ -1,7 +1,6 @@
 import numpy as np
 from random import sample
 import numpy.random as rnd
-import matplotlib.pyplot as plt
 from math import floor
 import time
 import matplotlib.pyplot as plt
@@ -356,76 +355,8 @@ def main():
     current_path = os.getcwd()+'/'
 
     results = simulate_network(simtime = simtime, start_stim = start_stim, end_stim = end_stim)     
-    '''results = pd.DataFrame(results)
-    results.to_csv('RESULTS.csv')'''
-
-    smA = nest.GetStatus(results["spike_monitor_A"])[0]
-    rmA = nest.GetStatus(results["rate_monitor_A"])[0]	
-    smB = nest.GetStatus(results["spike_monitor_B"])[0]
-    rmB = nest.GetStatus(results["rate_monitor_B"])[0]
-
-    fig = None
-    ax_raster = None
-    ax_rate = None
-    fig, (ax_raster, ax_rate) = plt.subplots(2, 1, sharex=True, figsize=(10,5))
-
-    evsA = smA["events"]["senders"]
-    tsA = smA["events"]["times"]
-    ax_raster.plot(tsA, evsA, ".", color='red', label ='pop A')
-    evsB = smB["events"]["senders"]
-    tsB = smB["events"]["times"]
-    ax_raster.plot(tsB, evsB, ".", color='blue', label ='pop B')
-    ax_raster.set_ylabel("neuron #")
-    ax_raster.set_title("Raster Plot ", fontsize=10)
-    ax_raster.legend()
-
-    t = np.arange(0., simtime, dt_rec)
-    A_N_A = np.ones((t.size, 1)) * np.nan
-    trmA = rmA["events"]["times"]
-    trmA = trmA * dt - t0
-    bins = np.concatenate((t, np.array([t[-1] + dt_rec])))
-    A_N_A = np.histogram(trmA, bins=bins)[0] / 400 / dt_rec
-    ax_rate.plot(t, A_N_A * 1000, color='red', label ='pop A')
-    ax_rate.fill_between(t, A_N_A * 1000, color='red')
-    B_N_B = np.ones((t.size, 1)) * np.nan
-    trmB = rmB["events"]["times"]
-    trmB = trmB * dt - t0
-    bins = np.concatenate((t, np.array([t[-1] + dt_rec])))
-    B_N_B = np.histogram(trmB, bins=bins)[0] / 400 / dt_rec
-    ax_rate.plot(t, B_N_B * 1000, color='blue', label ='pop B')
-    ax_rate.fill_between(t, B_N_B * 1000, color='blue')
-
-    ax_rate.vlines(start_stim, 0, 40, color='grey')
-    ax_rate.vlines(end_stim, 0, 40, color='grey')
-    ax_rate.set_ylabel("A(t) [Hz]")
-    ax_rate.set_title("Activity", fontsize=10)
-    ax_rate.legend()
-
-    plt.xlabel("t [ms]")
-
-    '''    
-    ax_raster_B = None
-    ax_rate_B = None
-    fig, (ax_raster_B, ax_rate_B)= plt.subplots(2, 1, sharex=True, figsize=(10,5))
-
-    evsB = smB["events"]["senders"]
-    tsB = smB["events"]["times"]
-    ax_raster_B.plot(tsB, evsB, ".")
-    ax_raster_B.set_ylabel("neuron #")
-    ax_raster_B.set_title("Raster Plot pop_B", fontsize=10)
-
-    t = np.arange(0., simtime, dt_rec)
-    B_N_B = np.ones((t.size, 1)) * np.nan
-    trmB = rmB["events"]["times"]
-    trmB = trmB * dt - t0
-    bins = np.concatenate((t, np.array([t[-1] + dt_rec])))
-    B_N_B = np.histogram(trmB, bins=bins)[0] / 400 / dt_rec
-    ax_rate_B.plot(t, B_N_B * 1000)
-    ax_rate_B.set_ylabel("A(t) [Hz]")
-    ax_rate_B.set_title("Activity pop_B", fontsize=10)
-    plt.xlabel("t [ms]")'''
-
-    plt.show()
+    results = pd.DataFrame(results)
+    results.to_csv(notes + 'results.csv')
 
     return
 
