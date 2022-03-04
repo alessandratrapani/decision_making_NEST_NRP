@@ -30,7 +30,7 @@ rmB = nest.GetStatus(results["rate_monitor_B"])[0]
 fig = None
 ax_raster = None
 ax_rate = None
-fig, (ax_raster, ax_rate) = plt.subplots(2, 1, sharex=True, figsize=(10,5))
+fig, (ax_raster, ax_rate) = plt.subplots(2, 1, sharex=True, figsize=(16,9))
 
 plt.suptitle('Coherence ' + str(coherence*100) + '%')
 
@@ -59,16 +59,27 @@ bins = np.concatenate((t, np.array([t[-1] + dt_rec])))
 B_N_B = np.histogram(trmB, bins=bins)[0] / 400 / dt_rec
 ax_rate.plot(t, B_N_B * 1000, color='blue', label ='pop B')
 ax_rate.fill_between(t, B_N_B * 1000, color='blue')
-
 ax_rate.vlines(start_stim, 0, 40, color='grey')
 ax_rate.vlines(end_stim, 0, 40, color='grey')
 ax_rate.set_ylabel("A(t) [Hz]")
 ax_rate.set_title("Activity", fontsize=10)
 ax_rate.legend()
-
 plt.xlabel("t [ms]")
 
+
+
+decisional_space = plt.figure(figsize = [10,10])
+if np.mean(A_N_A*1000)>np.mean(B_N_B*1000):
+    c='red'
+else:
+    c='blue'
+
+plt.plot(A_N_A * 1000,B_N_B * 1000, color=c)
+plt.plot([0,40],[0,40], color='grey')
+plt.xlim(-0.1,40)
+plt.ylim(-0.1,40)
 plt.show()
+
 #TODO save results correctly
 results = pd.DataFrame(results)
 results.to_csv(notes+'results.csv')
