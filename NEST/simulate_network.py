@@ -181,8 +181,8 @@ def simulate_network(coherence = 51.2, order = 400, start_stim = 500.0, end_stim
         nest.SetStatus(PG_noise_to_inh, "rate", rate_inh)
 
         if t >= start_stim  and t < end_stim:
-            offset_A = mean_p_rate_stimulus * (0.5 + (0.5 * coherence))
-            offset_B = mean_p_rate_stimulus * (0.5 - (0.5 * coherence))
+            offset_A = mean_p_rate_stimulus * (0.5 - (0.5 * coherence))
+            offset_B = mean_p_rate_stimulus * (0.5 + (0.5 * coherence))
 
             rate_A = np.random.normal(offset_A, std_p_rate_stimulus)
             rate_A = (max(0., rate_A)) #no negative rate
@@ -200,7 +200,12 @@ def simulate_network(coherence = 51.2, order = 400, start_stim = 500.0, end_stim
             nest.SetStatus(PG_input_NMDA_A, "rate", 0.)
             nest.SetStatus(PG_input_AMPA_B, "rate", 0.)
             nest.SetStatus(PG_input_NMDA_B, "rate", 0.)
+
+            rate_A = 0.0
+            rate_B = 0.0
             print("stim off.")
+        
+        return rate_A, rate_B
 
     #'''
     #'''**********************************************************************************
@@ -320,10 +325,14 @@ def simulate_network(coherence = 51.2, order = 400, start_stim = 500.0, end_stim
     startbuild = time.time()
     sim_steps = np.arange(0, simtime, stimulus_update_interval)
     print(sim_steps)
+    stimulus_A = np.zeros((int(simtime)))
+    stimulus_B = np.zeros((int(simtime)))
 
     for i, step in enumerate(sim_steps):
         print("Step number {} of {}".format(i+1, len(sim_steps)))
-        update_poisson_stimulus(step)
+        rate_A, rate_B = update_poisson_stimulus(step)
+        stimulus_A[int(step):int(step+stimulus_update_interval)] = rate_A
+        stimulus_B[int(step):int(step+stimulus_update_interval)] = rate_B
         nest.Simulate(stimulus_update_interval)
 
     endsimulate = time.time()
@@ -332,7 +341,7 @@ def simulate_network(coherence = 51.2, order = 400, start_stim = 500.0, end_stim
 
     ret_vals["rate_monitor_A"] = rate_monitor_A
     ret_vals["spike_monitor_A"] = spike_monitor_A
-    ret_vals["idx_monitored_neurons_A"] = idx_monitored_neurons_B
+    ret_vals["idx_monitored_neurons_A"] = idx_monitored_neurons_A
 
     ret_vals["rate_monitor_B"] = rate_monitor_B
     ret_vals["spike_monitor_B"] = spike_monitor_B
@@ -344,7 +353,7 @@ def simulate_network(coherence = 51.2, order = 400, start_stim = 500.0, end_stim
     print("Building time     : %.2f s" % build_time)
     print("Simulation time   : %.2f s" % sim_time)    
 
-    return ret_vals
+    return ret_vals, stimulus_A, stimulus_B
 
 def main():
 

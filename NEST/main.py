@@ -12,7 +12,7 @@ dt_rec = 10.0
 nest.SetKernelStatus({"resolution": dt, "print_time": True, "overwrite_files": True})
 t0 = nest.GetKernelStatus('time')
 
-notes = 'o400_c0_'
+notes = 'C_0-0_'
 coherence = 0.0
 order = 400
 simtime = 3000.0
@@ -20,7 +20,7 @@ start_stim = 500.0
 end_stim = 1000.0
 current_path = os.getcwd()+'/'
 
-results = simulate_network(coherence, order , start_stim , end_stim , simtime)     
+results, stimulus_A, stimulus_B = simulate_network(coherence, order , start_stim , end_stim , simtime)     
 
 #TODO test EXC without NMDA --> solo AMPA (no recurrent)
 smA = nest.GetStatus(results["spike_monitor_A"])[0]
@@ -30,7 +30,7 @@ rmB = nest.GetStatus(results["rate_monitor_B"])[0]
 fig = None
 ax_raster = None
 ax_rate = None
-fig, (ax_raster, ax_rate) = plt.subplots(2, 1, sharex=True, figsize=(16,9))
+fig, (ax_raster, ax_rate, ax_stimuli) = plt.subplots(3, 1, sharex=True, figsize=(16,9))
 plt.suptitle('Coherence ' + str(coherence*100) + '%')
 evsA = smA["events"]["senders"]
 tsA = smA["events"]["times"]
@@ -61,12 +61,17 @@ ax_rate.vlines(end_stim, 0, 40, color='grey')
 ax_rate.set_ylabel("A(t) [Hz]")
 ax_rate.set_title("Activity", fontsize=10)
 ax_rate.legend()
+ax_stimuli.plot(np.arange(0., simtime),stimulus_A, 'red', label='stimulus on A')
+ax_stimuli.plot(np.arange(0., simtime),stimulus_B, 'blue', label='stimulus on B')
+ax_stimuli.legend()
 plt.xlabel("t [ms]")
 
 decisional_space = plt.figure(figsize = [10,10])
 if np.mean(A_N_A*1000)>np.mean(B_N_B*1000):
     c='red'
+    winner = 'pop_A'
 else:
+    winner = 'pop_B'
     c='blue'
 plt.plot(A_N_A * 1000,B_N_B * 1000, color=c)
 plt.plot([0,40],[0,40], color='grey')
@@ -74,8 +79,22 @@ plt.xlim(-0.1,40)
 plt.ylim(-0.1,40)
 plt.show()
 
-#TODO save results correctly
-results = pd.DataFrame(results)
-results.to_csv(notes+'results.csv')
 
-#TODO
+
+saving_dir = 'results/'+notes+winner+'/'
+if not os.path.exists(saving_dir):
+    os.makedirs(saving_dir)
+
+raster_A = {'ID neuron pop_A':evsA, 'event time pop_A':tsA}
+raster_B = { 'ID neuron pop_B':evsB, 'event time pop_B':tsB}
+activity = {'time':t,'activity (Hz) pop_A': A_N_A*1000, 'activity (Hz) pop_B': B_N_B*1000}
+stimuli = {'stimulus pop A': stimulus_A,'stimulus pop B': stimulus_B}
+events_A = pd.DataFrame(raster_A)
+events_B = pd.DataFrame(raster_B)
+frequency = pd.DataFrame(activity)
+stimuli = pd.DataFrame(stimuli)
+events_A.to_csv(saving_dir+notes+'events_pop_A.csv')
+events_B.to_csv(saving_dir+notes+'events_pop_B.csv')
+frequency.to_csv(saving_dir+notes+'frequency.csv')
+stimuli.to_csv(saving_dir+notes+'stimuli.csv')
+
