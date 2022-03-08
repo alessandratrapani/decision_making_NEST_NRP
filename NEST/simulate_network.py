@@ -357,17 +357,13 @@ def simulate_network(coherence = 51.2, order = 400, start_stim = 500.0, end_stim
 
 def main():
 
-    notes = None
     simtime = 3000.0
     start_stim = 500.0
     end_stim = 1000.0
-    current_path = os.getcwd()+'/'
 
-    results = simulate_network(simtime = simtime, start_stim = start_stim, end_stim = end_stim)     
-    results = pd.DataFrame(results)
-    results.to_csv(notes + 'results.csv')
+    results, stimulus_A, stimulus_B = simulate_network(simtime = simtime, start_stim = start_stim, end_stim = end_stim)     
 
-    return
+    return results, stimulus_A, stimulus_B
 
 if __name__ == "__main__":
 	main()

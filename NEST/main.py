@@ -22,7 +22,7 @@ current_path = os.getcwd()+'/'
 
 results, stimulus_A, stimulus_B = simulate_network(coherence, order , start_stim , end_stim , simtime)     
 
-#TODO test EXC without NMDA --> solo AMPA (no recurrent)
+
 smA = nest.GetStatus(results["spike_monitor_A"])[0]
 rmA = nest.GetStatus(results["rate_monitor_A"])[0]	
 smB = nest.GetStatus(results["spike_monitor_B"])[0]
@@ -77,6 +77,9 @@ plt.plot(A_N_A * 1000,B_N_B * 1000, color=c)
 plt.plot([0,40],[0,40], color='grey')
 plt.xlim(-0.1,40)
 plt.ylim(-0.1,40)
+plt.xlabel("Firing rate pop A (Hz)")
+plt.ylabel("Firing rate pop B (Hz)")
+plt.title("Decision Space")
 plt.show()
 
 
@@ -85,6 +88,8 @@ saving_dir = 'results/'+notes+winner+'/'
 if not os.path.exists(saving_dir):
     os.makedirs(saving_dir)
 
+fig.savefig(saving_dir+notes+winner+'raster_activity_stimuli.eps' , bbox_inches='tight')
+decisional_space.savefig(saving_dir+notes+winner+'decision_space.eps' , bbox_inches='tight')
 raster_A = {'ID neuron pop_A':evsA, 'event time pop_A':tsA}
 raster_B = { 'ID neuron pop_B':evsB, 'event time pop_B':tsB}
 activity = {'time':t,'activity (Hz) pop_A': A_N_A*1000, 'activity (Hz) pop_B': B_N_B*1000}

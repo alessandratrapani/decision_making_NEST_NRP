@@ -42,12 +42,12 @@ from scipy.signal import savgol_filter
 b2.defaultclock.dt = 0.10 * b2.ms
 
 
-def sim_decision_making_network(Ne = 1600, Ni=400, weight_scaling_factor=5.33,
-                                t_stimulus_start=100 * b2.ms, t_stimulus_duration=9999 * b2.ms, 
-                                coherence_level=0.,
-                                stimulus_update_interval=30 * b2.ms, mu0_mean_stimulus_Hz=60., stimulus_std_Hz=4.,
-                                N_extern=1000, firing_rate_extern=200.*b2.Hz,
-                                w_pos=1.80, f_Subpop_size=0.15,
+def sim_decision_making_network(N_Excit=384, N_Inhib=96, weight_scaling_factor=5.33,
+                                t_stimulus_start=100 * b2.ms, t_stimulus_duration=9999 * b2.ms, coherence_level=0.,
+                                stimulus_update_interval=30 * b2.ms, mu0_mean_stimulus_Hz=160.,
+                                stimulus_std_Hz=20.,
+                                N_extern=1000, firing_rate_extern=9.8 * b2.Hz,
+                                w_pos=1.90, f_Subpop_size=0.25,  # .15 in publication [1]
                                 max_sim_time=1000. * b2.ms, stop_condition_rate=None,
                                 monitored_subset_size=512):
     """
@@ -82,12 +82,12 @@ def sim_decision_making_network(Ne = 1600, Ni=400, weight_scaling_factor=5.33,
          "voltage_monitor_inhib", "idx_monitored_neurons_inhib"
     """
 
+    print("simulating {} neurons. Start: {}".format(N_Excit + N_Inhib, time.ctime()))
     t_stimulus_end = t_stimulus_start + t_stimulus_duration
 
-
-    N_Group_A = int(Ne * f_Subpop_size)  # size of the excitatory subpopulation sensitive to stimulus A
+    N_Group_A = int(N_Excit * f_Subpop_size)  # size of the excitatory subpopulation sensitive to stimulus A
     N_Group_B = N_Group_A  # size of the excitatory subpopulation sensitive to stimulus B
-    N_Group_Z = Ne - N_Group_A - N_Group_B  # (1-2f)Ne excitatory neurons do not respond to either stimulus.
+    N_Group_Z = N_Excit - N_Group_A - N_Group_B  # (1-2f)Ne excitatory neurons do not respond to either stimulus.
 
     Cm_excit = 0.5 * b2.nF  # membrane capacitance of excitatory neurons
     G_leak_excit = 25.0 * b2.nS  # leak conductance
@@ -107,7 +107,7 @@ def sim_decision_making_network(Ne = 1600, Ni=400, weight_scaling_factor=5.33,
 
     # specify the AMPA synapses
     E_AMPA = 0.0 * b2.mV
-    tau_AMPA = 2. * b2.ms
+    tau_AMPA = 2.5 * b2.ms
 
     # specify the GABA synapses
     E_GABA = -70.0 * b2.mV
@@ -124,20 +124,14 @@ def sim_decision_making_network(Ne = 1600, Ni=400, weight_scaling_factor=5.33,
     g_AMPA_extern2excit = 2.1 * b2.nS
 
     # projectsions from the inhibitory populations
-    #g_GABA_inhib2inhib = weight_scaling_factor * 1.25 * b2.nS
-    g_GABA_inhib2inhib = 1.0 * b2.nS
-    #g_GABA_inhib2excit = weight_scaling_factor * 1.60 * b2.nS
-    g_GABA_inhib2excit = 1.3 * b2.nS
+    g_GABA_inhib2inhib = weight_scaling_factor * 1.25 * b2.nS
+    g_GABA_inhib2excit = weight_scaling_factor * 1.60 * b2.nS
 
     # projections from the excitatory population
-    #g_AMPA_excit2excit = weight_scaling_factor * 0.012 * b2.nS
-    g_AMPA_excit2excit = 0.05 * b2.nS
-    #g_AMPA_excit2inhib = weight_scaling_factor * 0.015 * b2.nS
-    g_AMPA_excit2inhib = 0.04 * b2.nS
-    # g_NMDA_excit2excit = weight_scaling_factor * 0.040 * b2.nS
-    g_NMDA_excit2excit = 0.165 * b2.nS 
-    # g_NMDA_excit2inhib = weight_scaling_factor * 0.045 * b2.nS  # stronger projection to inhib.
-    g_NMDA_excit2inhib = 0.13 * b2.nS 
+    g_AMPA_excit2excit = weight_scaling_factor * 0.012 * b2.nS
+    g_AMPA_excit2inhib = weight_scaling_factor * 0.015 * b2.nS
+    g_NMDA_excit2excit = weight_scaling_factor * 0.040 * b2.nS
+    g_NMDA_excit2inhib = weight_scaling_factor * 0.045 * b2.nS  # stronger projection to inhib.
 
     # weights and "adjusted" weights.
     w_neg = 1. - f_Subpop_size * (w_pos - 1.) / (1. - f_Subpop_size)
@@ -162,11 +156,11 @@ def sim_decision_making_network(Ne = 1600, Ni=400, weight_scaling_factor=5.33,
     """
 
     inhib_pop = NeuronGroup(
-        Ni, model=inhib_lif_dynamics,
+        N_Inhib, model=inhib_lif_dynamics,
         threshold="v>v_spike_thr_inhib", reset="v=v_reset_inhib", refractory=t_abs_refract_inhib,
         method="rk2")
     # initialize with random voltages:
-    inhib_pop.v = rnd.uniform(v_spike_thr_inhib / b2.mV - 4., high=v_spike_thr_inhib / b2.mV - 1., size=Ni) * b2.mV
+    inhib_pop.v = rnd.uniform(v_spike_thr_inhib / b2.mV - 4., high=v_spike_thr_inhib / b2.mV - 1., size=N_Inhib) * b2.mV
 
     # Specify the excitatory population:
     # dynamics:
@@ -204,16 +198,14 @@ def sim_decision_making_network(Ne = 1600, Ni=400, weight_scaling_factor=5.33,
     # now define the connections:
     # projections FROM EXTERNAL POISSON GROUP: ####################################################
     poisson2Inhib = PoissonInput(target=inhib_pop, target_var="s_AMPA",
-                                 N=Ni, rate=firing_rate_extern, weight=w_ext2inhib)
-
+                                 N=N_extern, rate=firing_rate_extern, weight=w_ext2inhib)
     poisson2A = PoissonInput(target=excit_pop_A, target_var="s_AMPA",
-                             N=N_Group_A, rate=firing_rate_extern, weight=w_ext2excit)
+                             N=N_extern, rate=firing_rate_extern, weight=w_ext2excit)
 
     poisson2B = PoissonInput(target=excit_pop_B, target_var="s_AMPA",
-                             N=N_Group_B, rate=firing_rate_extern, weight=w_ext2excit)
-
+                             N=N_extern, rate=firing_rate_extern, weight=w_ext2excit)
     poisson2Z = PoissonInput(target=excit_pop_Z, target_var="s_AMPA",
-                             N=N_Group_Z, rate=firing_rate_extern, weight=w_ext2excit)
+                             N=N_extern, rate=firing_rate_extern, weight=w_ext2excit)
 
     ###############################################################################################
 
@@ -309,10 +301,6 @@ def sim_decision_making_network(Ne = 1600, Ni=400, weight_scaling_factor=5.33,
             # print("stim off")
             poissonStimulus2A.rates = 0.
             poissonStimulus2B.rates = 0.
-            rate_A = 0.
-            rate_B = 0.
-        
-        return rate_A, rate_B
 
     ###############################################################################################
 
@@ -487,22 +475,25 @@ def getting_started():
     stim_duration = 350. * b2.ms
     print("stimulus start: {}, stimulus end: {}".format(stim_start, stim_start+stim_duration))
 
-    results = sim_decision_making_network()
+    results = sim_decision_making_network(N_Excit=341, N_Inhib=85, weight_scaling_factor=6.0,
+                                          t_stimulus_start=stim_start, t_stimulus_duration=stim_duration,
+                                          coherence_level=+0.70, w_pos=2.0, f_Subpop_size=0.25, mu0_mean_stimulus_Hz=500.0 * b2.Hz,
+                                          max_sim_time=800. * b2.ms)
 
-    plot_tools.plot_network_activity(results["rate_monitor_A"], results["spike_monitor_A"],results["voltage_monitor_A"],
-                                     t_min=0. * b2.ms, avg_window_width=20. * b2.ms,
-                                     sup_title="Pop A")
-    plot_tools.plot_network_activity(results["rate_monitor_B"], results["spike_monitor_B"],results["voltage_monitor_B"],
-                                     t_min=0. * b2.ms, avg_window_width=20. * b2.ms,
-                                     sup_title="Pop B")
-    # plot_tools.plot_network_activity(results["rate_monitor_Z"], results["spike_monitor_Z"],
-    #                                  t_min=0. * b2.ms, avg_window_width=20. * b2.ms,
-    #                                  sup_title="Pop Z")
-    # plot_tools.plot_network_activity(results["rate_monitor_inhib"], results["spike_monitor_inhib"],
-    #                                  t_min=0. * b2.ms, avg_window_width=20. * b2.ms,
-    #                                  sup_title="Pop Inhib")
+    plot_tools.plot_network_activity(results["rate_monitor_A"], results["spike_monitor_A"],
+                                     results["voltage_monitor_A"], t_min=0. * b2.ms, avg_window_width=20. * b2.ms,
+                                     sup_title="Left (Brian) (c=0.70)")
+    plot_tools.plot_network_activity(results["rate_monitor_B"], results["spike_monitor_B"],
+                                     results["voltage_monitor_B"], t_min=0. * b2.ms, avg_window_width=20. * b2.ms,
+                                     sup_title="Right (Brian) (c=0.70)")
+    """plot_tools.plot_network_activity(results["rate_monitor_Z"], results["spike_monitor_Z"],
+                                     results["voltage_monitor_Z"], t_min=0. * b2.ms, avg_window_width=20. * b2.ms,
+                                     sup_title="Z")
+    plot_tools.plot_network_activity(results["rate_monitor_inhib"], results["spike_monitor_inhib"],
+                                     results["voltage_monitor_inhib"], t_min=0. * b2.ms, avg_window_width=20. * b2.ms,
+                                     sup_title="Inhib")
 
-    	
+    """	
     #Fig conjunta
 
     def get_spike_train_ts_indices(spike_train):
@@ -550,6 +541,7 @@ def getting_started():
         neuron_counter += 1
 
     ax_raster.add_patch(rect)
+    #ax_raster.set_ylim([0, neuron_counter])
     ax_raster.set_ylabel("neuron #")
     ax_raster.set_title("Raster Plot", fontsize=14.5)
     fig.legend(['Pop. A (left)', 'Pop. B (right)', 'Stimulus window'], loc='upper right', bbox_to_anchor=(0.9, 1.0), fontsize = "12.5", markerscale = 3.0)
@@ -569,6 +561,34 @@ def getting_started():
     ax_rate_A.set_ylabel("A(t) [Hz]")
     ax_rate_A.set_title("Activity of pop. B", fontsize=14.5)
     ax_rate_A.set_ylim([0, 110])
+
+    """nr_neurons_A = len(spike_train_idx_list_A)
+    traces_i_A = range(nr_neurons_A)
+    tsA = results["voltage_monitor_A"].t / b2.ms
+    idx_voltage_A = (tsA >= t_min) & (tsA <= t_max)
+    count = 0
+    for i in range(len(traces_i_A)):
+        if count<2:
+            raster_plot_index_A = traces_i_A[i]
+            population_index_A = spike_train_idx_list_A[raster_plot_index_A]
+            ax_voltage.plot(tsA[idx_voltage_A], results["voltage_monitor_A"][population_index_A].v[idx_voltage_A]/b2.mV, lw=1., c="b")
+            count = count + 1 
+    
+    nr_neurons_B = len(spike_train_idx_list_B)
+    traces_i_B = range(nr_neurons_B)
+    tsB = results["voltage_monitor_B"].t / b2.ms
+    idx_voltage_B = (tsB >= t_min) & (tsB <= t_max)
+    count = 0
+    for i in range(len(traces_i_B)):
+        if count<2:
+            raster_plot_index_B = traces_i_B[i]
+            population_index_B = spike_train_idx_list_B[raster_plot_index_B]
+            ax_voltage.plot(tsA[idx_voltage_B], results["voltage_monitor_B"][population_index_B].v[idx_voltage_B]/b2.mV, lw=1., c="r")
+            count = count + 1 
+	
+    ax_voltage.set_ylabel("V(t) [mV]")
+    ax_voltage.set_title("Voltage traces", fontsize=14.5)
+    ax_voltage.set_ylim([-72.0, -48.0])"""
     plt.xlabel("t [ms]")
     
     plt.show()
