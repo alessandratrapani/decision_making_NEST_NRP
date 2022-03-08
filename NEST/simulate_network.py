@@ -176,9 +176,9 @@ def simulate_network(coherence = 51.2, order = 400, start_stim = 500.0, end_stim
     std_p_rate_stimulus = mean_p_rate_stimulus / tuned_par['std_ratio'][0]
 
     def update_poisson_stimulus(t):
-        rate_noise_A = np.random.normal(p_rate_ex, p_rate_ex/1000)
-        rate_noise_B = np.random.normal(p_rate_ex, p_rate_ex/1000)
-        rate_noise_inh = np.random.normal(p_rate_in, p_rate_in/100)
+        rate_noise_A = np.random.normal(p_rate_ex, p_rate_ex/200)
+        rate_noise_B = np.random.normal(p_rate_ex, p_rate_ex/200)
+        rate_noise_inh = np.random.normal(p_rate_in, p_rate_in/200)
         nest.SetStatus(PG_noise_to_A, "rate", rate_noise_A)
         nest.SetStatus(PG_noise_to_B, "rate", rate_noise_B)
         nest.SetStatus(PG_noise_to_inh, "rate", rate_noise_inh)

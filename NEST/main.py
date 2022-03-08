@@ -12,8 +12,8 @@ dt_rec = 10.0
 nest.SetKernelStatus({"resolution": dt, "print_time": True, "overwrite_files": True})
 t0 = nest.GetKernelStatus('time')
 
-notes = 'C_0-0_'
-coherence = 0.0
+notes = 'C_51-2_'
+coherence = -0.512
 order = 400
 simtime = 3000.0
 start_stim = 500.0
@@ -22,7 +22,7 @@ current_path = os.getcwd()+'/'
 
 results, stimulus_A, stimulus_B = simulate_network(coherence, order , start_stim , end_stim , simtime)     
 
-
+#TODO find optimal par std and mean for stimulus and std for noise
 smA = nest.GetStatus(results["spike_monitor_A"])[0]
 rmA = nest.GetStatus(results["rate_monitor_A"])[0]	
 smB = nest.GetStatus(results["spike_monitor_B"])[0]
