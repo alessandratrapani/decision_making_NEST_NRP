@@ -17,7 +17,7 @@ coherence = 0.0
 order = 400
 simtime = 3000.0
 start_stim = 500.0
-end_stim = 1000.0
+end_stim = 1500.0
 current_path = os.getcwd()+'/'
 
 results, stimulus_A, stimulus_B = simulate_network(coherence, order , start_stim , end_stim , simtime)     
@@ -46,14 +46,14 @@ A_N_A = np.ones((t.size, 1)) * np.nan
 trmA = rmA["events"]["times"]
 trmA = trmA * dt - t0
 bins = np.concatenate((t, np.array([t[-1] + dt_rec])))
-A_N_A = np.histogram(trmA, bins=bins)[0] / 400 / dt_rec
+A_N_A = np.histogram(trmA, bins=bins)[0] / order / dt_rec
 ax_rate.plot(t, A_N_A * 1000, color='red', label ='pop A')
 ax_rate.fill_between(t, A_N_A * 1000, color='red')
 B_N_B = np.ones((t.size, 1)) * np.nan
 trmB = rmB["events"]["times"]
 trmB = trmB * dt - t0
 bins = np.concatenate((t, np.array([t[-1] + dt_rec])))
-B_N_B = np.histogram(trmB, bins=bins)[0] / 400 / dt_rec
+B_N_B = np.histogram(trmB, bins=bins)[0] / order / dt_rec
 ax_rate.plot(t, B_N_B * 1000, color='blue', label ='pop B')
 ax_rate.fill_between(t, B_N_B * 1000, color='blue')
 ax_rate.vlines(start_stim, 0, 40, color='grey')

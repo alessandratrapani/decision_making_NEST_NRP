@@ -131,7 +131,8 @@ def simulate_network(coherence = 51.2, order = 400, start_stim = 500.0, end_stim
     print("p_rate_in: %f" % p_rate_in)
 
     #nest.SetDefaults("poisson_generator", {"rate": p_rate_ex})    #poisson generator for the noise in input to popA and popB
-    PG_noise_to_ex = nest.Create("poisson_generator")
+    PG_noise_to_A = nest.Create("poisson_generator")
+    PG_noise_to_B = nest.Create("poisson_generator")
 
     #nest.SetDefaults("poisson_generator", {"rate": p_rate_in})   #poisson generator for the noise in input to popinh
     PG_noise_to_inh = nest.Create("poisson_generator")
@@ -141,8 +142,8 @@ def simulate_network(coherence = 51.2, order = 400, start_stim = 500.0, end_stim
     noise_syn = {"model": "noise_syn",
                     "receptor_type": 1}
 
-    nest.Connect(PG_noise_to_ex, pop_A, syn_spec=noise_syn)
-    nest.Connect(PG_noise_to_ex, pop_B, syn_spec=noise_syn)
+    nest.Connect(PG_noise_to_A, pop_A, syn_spec=noise_syn)
+    nest.Connect(PG_noise_to_B, pop_B, syn_spec=noise_syn)
     nest.Connect(PG_noise_to_inh, pop_inh, syn_spec=noise_syn)
 
     #'''
@@ -175,10 +176,12 @@ def simulate_network(coherence = 51.2, order = 400, start_stim = 500.0, end_stim
     std_p_rate_stimulus = mean_p_rate_stimulus / tuned_par['std_ratio'][0]
 
     def update_poisson_stimulus(t):
-        rate_exc = np.random.normal(p_rate_ex, p_rate_ex/100)
-        rate_inh = np.random.normal(p_rate_in, p_rate_ex/100)
-        nest.SetStatus(PG_noise_to_ex, "rate", rate_exc)
-        nest.SetStatus(PG_noise_to_inh, "rate", rate_inh)
+        rate_noise_A = np.random.normal(p_rate_ex, p_rate_ex/1000)
+        rate_noise_B = np.random.normal(p_rate_ex, p_rate_ex/1000)
+        rate_noise_inh = np.random.normal(p_rate_in, p_rate_in/100)
+        nest.SetStatus(PG_noise_to_A, "rate", rate_noise_A)
+        nest.SetStatus(PG_noise_to_B, "rate", rate_noise_B)
+        nest.SetStatus(PG_noise_to_inh, "rate", rate_noise_inh)
 
         if t >= start_stim  and t < end_stim:
             offset_A = mean_p_rate_stimulus * (0.5 - (0.5 * coherence))
