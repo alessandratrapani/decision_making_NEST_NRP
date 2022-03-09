@@ -12,15 +12,16 @@ dt_rec = 10.0
 nest.SetKernelStatus({"resolution": dt, "print_time": True, "overwrite_files": True})
 t0 = nest.GetKernelStatus('time')
 
-notes = 'C_51-2_'
-coherence = -0.512
+save = False
+notes = 'C_0-0_'
+coherence = -0.128
 order = 400
 simtime = 3000.0
 start_stim = 500.0
 end_stim = 1500.0
 current_path = os.getcwd()+'/'
-
-results, stimulus_A, stimulus_B = simulate_network(coherence, order , start_stim , end_stim , simtime)     
+n_run=1
+results, stimulus_A, stimulus_B = simulate_network(n_run, coherence, order , start_stim , end_stim , simtime)     
 
 #TODO find optimal par std and mean for stimulus and std for noise
 smA = nest.GetStatus(results["spike_monitor_A"])[0]
@@ -83,23 +84,23 @@ plt.title("Decision Space")
 plt.show()
 
 
+if save:
+    saving_dir = 'results/'+notes+winner+'/'
+    if not os.path.exists(saving_dir):
+        os.makedirs(saving_dir)
 
-saving_dir = 'results/'+notes+winner+'/'
-if not os.path.exists(saving_dir):
-    os.makedirs(saving_dir)
-
-fig.savefig(saving_dir+notes+winner+'raster_activity_stimuli.eps' , bbox_inches='tight')
-decisional_space.savefig(saving_dir+notes+winner+'decision_space.eps' , bbox_inches='tight')
-raster_A = {'ID neuron pop_A':evsA, 'event time pop_A':tsA}
-raster_B = { 'ID neuron pop_B':evsB, 'event time pop_B':tsB}
-activity = {'time':t,'activity (Hz) pop_A': A_N_A*1000, 'activity (Hz) pop_B': B_N_B*1000}
-stimuli = {'stimulus pop A': stimulus_A,'stimulus pop B': stimulus_B}
-events_A = pd.DataFrame(raster_A)
-events_B = pd.DataFrame(raster_B)
-frequency = pd.DataFrame(activity)
-stimuli = pd.DataFrame(stimuli)
-events_A.to_csv(saving_dir+notes+'events_pop_A.csv')
-events_B.to_csv(saving_dir+notes+'events_pop_B.csv')
-frequency.to_csv(saving_dir+notes+'frequency.csv')
-stimuli.to_csv(saving_dir+notes+'stimuli.csv')
+    fig.savefig(saving_dir+notes+winner+'raster_activity_stimuli.eps' , bbox_inches='tight')
+    decisional_space.savefig(saving_dir+notes+winner+'decision_space.eps' , bbox_inches='tight')
+    raster_A = {'ID neuron pop_A':evsA, 'event time pop_A':tsA}
+    raster_B = { 'ID neuron pop_B':evsB, 'event time pop_B':tsB}
+    activity = {'time':t,'activity (Hz) pop_A': A_N_A*1000, 'activity (Hz) pop_B': B_N_B*1000}
+    stimuli = {'stimulus pop A': stimulus_A,'stimulus pop B': stimulus_B}
+    events_A = pd.DataFrame(raster_A)
+    events_B = pd.DataFrame(raster_B)
+    frequency = pd.DataFrame(activity)
+    stimuli = pd.DataFrame(stimuli)
+    events_A.to_csv(saving_dir+notes+'events_pop_A.csv')
+    events_B.to_csv(saving_dir+notes+'events_pop_B.csv')
+    frequency.to_csv(saving_dir+notes+'frequency.csv')
+    stimuli.to_csv(saving_dir+notes+'stimuli.csv')
 

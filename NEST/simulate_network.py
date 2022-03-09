@@ -31,15 +31,16 @@ def ComputePSPNorm(tau_mem, C_mem, tau_syn):
             ((np.exp( -t_max / tau_mem) - np.exp(-t_max / tau_syn)) / b - 
             t_max * np.exp(-t_max / tau_syn)))) 
 
-def simulate_network(coherence = 51.2, order = 400, start_stim = 500.0, end_stim = 1000.0, simtime = 3000.0, stimulus_update_interval = 25, fn_fixed_par = "fixed_parameters.csv", fn_tuned_par = "tuned_parameters.csv"):
+def simulate_network(n_run=1,coherence = 51.2, order = 400, start_stim = 500.0, end_stim = 1000.0, simtime = 3000.0, stimulus_update_interval = 25, fn_fixed_par = "fixed_parameters.csv", fn_tuned_par = "tuned_parameters.csv"):
     
     current_path = os.getcwd()+'/'
     fixed_pars = pd.read_csv(current_path+fn_fixed_par)
     tuned_par = pd.read_csv(current_path+fn_tuned_par)
-
+    startbuild = time.time()
     nest.SetKernelStatus({"resolution": dt, "print_time": True, "overwrite_files": True})
-    NA = 2 * order  # number of excitatory neurons in pop A
     NB = 2 * order  # number of excitatory neurons in pop B
+    NA = 2 * order  # number of excitatory neurons in pop A
+
     NI = 1 * order  # number of inhibitory neurons
     N_neurons = NA + NB + NI   # number of neurons in total
     N_rec = order * (2+2+1)  # record from all neurons
@@ -65,12 +66,15 @@ def simulate_network(coherence = 51.2, order = 400, start_stim = 500.0, end_stim
         "tau_syn": tau_syn
     }
 
-    nest.SetDefaults("iaf_psc_exp_multisynapse", exc_neuron_params)
-    pop_A = nest.Create("iaf_psc_exp_multisynapse", NA)
-    pop_B = nest.Create("iaf_psc_exp_multisynapse", NB)
+    nest.CopyModel("iaf_psc_exp_multisynapse", "excitatory_pop", params=exc_neuron_params)
+    #nest.SetDefaults("iaf_psc_exp_multisynapse", exc_neuron_params)
+    #SE INVERTO ORDINE DI CREAZIONE RENDO LA POP DEFINITA PER PRIMA PIÙ SENSIBILE WTF?!?!?!? --> risolto con CopyModel
+    pop_A = nest.Create("excitatory_pop", NA)
+    pop_B = nest.Create("excitatory_pop", NB)
 
-    nest.SetDefaults("iaf_psc_exp_multisynapse", inh_neuron_params)
-    pop_inh = nest.Create("iaf_psc_exp_multisynapse", NI)
+    nest.CopyModel("iaf_psc_exp_multisynapse", "inhibitory_pop", params=inh_neuron_params)
+    #nest.SetDefaults("iaf_psc_exp_multisynapse", inh_neuron_params)
+    pop_inh = nest.Create("inhibitory_pop", NI)
 
     #'''
     #'''**********************************************************************************
@@ -87,12 +91,6 @@ def simulate_network(coherence = 51.2, order = 400, start_stim = 500.0, end_stim
 
     J_unit_GABA = ComputePSPNorm(fixed_pars['tau_m_in'][0], fixed_pars['C_m_in'][0], fixed_pars['tau_syn_GABA'][0])
     J_norm_GABA = J / J_unit_GABA
-
-    print("noise: %f" % J_norm_noise)
-    print("AMPA: %f" % J_norm_AMPA)
-    print("NMDA: %f" % J_norm_NMDA)  
-    print("GABA: %f" % J_norm_GABA)
-
     #'''
     #'''**********************************************************************************
 
@@ -127,12 +125,9 @@ def simulate_network(coherence = 51.2, order = 400, start_stim = 500.0, end_stim
     nu_in = tuned_par['eta_in'][0] * nu_th_noise_in
     p_rate_in = 1000.0 * nu_in
 
-    print("p_rate_ex: %f" % p_rate_ex)
-    print("p_rate_in: %f" % p_rate_in)
-
     #nest.SetDefaults("poisson_generator", {"rate": p_rate_ex})    #poisson generator for the noise in input to popA and popB
-    PG_noise_to_A = nest.Create("poisson_generator")
     PG_noise_to_B = nest.Create("poisson_generator")
+    PG_noise_to_A = nest.Create("poisson_generator")
 
     #nest.SetDefaults("poisson_generator", {"rate": p_rate_in})   #poisson generator for the noise in input to popinh
     PG_noise_to_inh = nest.Create("poisson_generator")
@@ -142,6 +137,7 @@ def simulate_network(coherence = 51.2, order = 400, start_stim = 500.0, end_stim
     noise_syn = {"model": "noise_syn",
                     "receptor_type": 1}
 
+    
     nest.Connect(PG_noise_to_A, pop_A, syn_spec=noise_syn)
     nest.Connect(PG_noise_to_B, pop_B, syn_spec=noise_syn)
     nest.Connect(PG_noise_to_inh, pop_inh, syn_spec=noise_syn)
@@ -150,11 +146,12 @@ def simulate_network(coherence = 51.2, order = 400, start_stim = 500.0, end_stim
     #'''**********************************************************************************
     
     # Input stimulus
+    PG_input_NMDA_B = nest.Create("poisson_generator")
+    PG_input_AMPA_B = nest.Create("poisson_generator")
+
     PG_input_NMDA_A = nest.Create("poisson_generator")
     PG_input_AMPA_A = nest.Create("poisson_generator")
 
-    PG_input_NMDA_B = nest.Create("poisson_generator")
-    PG_input_AMPA_B = nest.Create("poisson_generator")
 
     nest.CopyModel("static_synapse", "excitatory_AMPA_input",
                 {"weight": J_norm_AMPA, "delay": fixed_pars['delay_AMPA'][0]})
@@ -164,6 +161,7 @@ def simulate_network(coherence = 51.2, order = 400, start_stim = 500.0, end_stim
                 {"weight": J_norm_NMDA, "delay": fixed_pars['delay_NMDA'][0]})
     NMDA_input_syn = {"model": "excitatory_NMDA_input",
                     "receptor_type": 3}  
+  
 
     nest.Connect(PG_input_AMPA_A, pop_A, syn_spec=AMPA_input_syn)
     nest.Connect(PG_input_NMDA_A, pop_A, syn_spec=NMDA_input_syn)
@@ -176,9 +174,10 @@ def simulate_network(coherence = 51.2, order = 400, start_stim = 500.0, end_stim
     std_p_rate_stimulus = mean_p_rate_stimulus / tuned_par['std_ratio'][0]
 
     def update_poisson_stimulus(t):
-        rate_noise_A = np.random.normal(p_rate_ex, p_rate_ex/200)
-        rate_noise_B = np.random.normal(p_rate_ex, p_rate_ex/200)
-        rate_noise_inh = np.random.normal(p_rate_in, p_rate_in/200)
+
+        rate_noise_B = np.random.normal(p_rate_ex, p_rate_ex/tuned_par['std_noise'][0])
+        rate_noise_A = np.random.normal(p_rate_ex, p_rate_ex/tuned_par['std_noise'][0])
+        rate_noise_inh = np.random.normal(p_rate_in, p_rate_in/tuned_par['std_noise'][0])
         nest.SetStatus(PG_noise_to_A, "rate", rate_noise_A)
         nest.SetStatus(PG_noise_to_B, "rate", rate_noise_B)
         nest.SetStatus(PG_noise_to_inh, "rate", rate_noise_inh)
@@ -187,16 +186,18 @@ def simulate_network(coherence = 51.2, order = 400, start_stim = 500.0, end_stim
             offset_A = mean_p_rate_stimulus * (0.5 - (0.5 * coherence))
             offset_B = mean_p_rate_stimulus * (0.5 + (0.5 * coherence))
 
-            rate_A = np.random.normal(offset_A, std_p_rate_stimulus)
-            rate_A = (max(0., rate_A)) #no negative rate
             rate_B = np.random.normal(offset_B, std_p_rate_stimulus)
             rate_B = (max(0., rate_B)) #no negative rate
+            rate_A = np.random.normal(offset_A, std_p_rate_stimulus)
+            rate_A = (max(0., rate_A)) #no negative rate
+            
             
             nest.SetStatus(PG_input_AMPA_A, "rate", rate_A)
             nest.SetStatus(PG_input_NMDA_A, "rate", rate_A)
             nest.SetStatus(PG_input_AMPA_B, "rate", rate_B)
             nest.SetStatus(PG_input_NMDA_B, "rate", rate_B)
             print("stim on. rate_A={}, rate_B={}".format(rate_A, rate_B))
+            print('trial number {}'.format(n_run))
 
         else:
             nest.SetStatus(PG_input_AMPA_A, "rate", 0.)
@@ -207,8 +208,9 @@ def simulate_network(coherence = 51.2, order = 400, start_stim = 500.0, end_stim
             rate_A = 0.0
             rate_B = 0.0
             print("stim off.")
+            print('trial number {}'.format(n_run))
         
-        return rate_A, rate_B
+        return rate_A, rate_B, rate_noise_A, rate_noise_B
 
     #'''
     #'''**********************************************************************************
@@ -222,7 +224,6 @@ def simulate_network(coherence = 51.2, order = 400, start_stim = 500.0, end_stim
         Returns: monitors for rate, voltage, spikes and monitored neurons indexes.
         """
         monitored_subset_size = min(monitored_subset_size, len(pop))
-        print("Number of monitored neurons = {}".format(monitored_subset_size))
         
         idx_monitored_neurons = tuple(sample(list(pop), monitored_subset_size))
 
@@ -241,7 +242,6 @@ def simulate_network(coherence = 51.2, order = 400, start_stim = 500.0, end_stim
     rate_monitor_A, spike_monitor_A,  idx_monitored_neurons_A = get_monitors(pop_A, len(pop_A))
     rate_monitor_B, spike_monitor_B,  idx_monitored_neurons_B = get_monitors(pop_B, len(pop_B))
 
-    print("Monitors created and connected")
 
     #'''
     #'''**********************************************************************************
@@ -325,17 +325,22 @@ def simulate_network(coherence = 51.2, order = 400, start_stim = 500.0, end_stim
     #'''**********************************************************************************
 
     endbuild = time.time()
-    startbuild = time.time()
+    
     sim_steps = np.arange(0, simtime, stimulus_update_interval)
     print(sim_steps)
     stimulus_A = np.zeros((int(simtime)))
     stimulus_B = np.zeros((int(simtime)))
 
+    noise_A = np.zeros((int(simtime)))
+    noise_B = np.zeros((int(simtime)))
+
     for i, step in enumerate(sim_steps):
         print("Step number {} of {}".format(i+1, len(sim_steps)))
-        rate_A, rate_B = update_poisson_stimulus(step)
+        rate_A, rate_B, rate_noise_A, rate_noise_B = update_poisson_stimulus(step)
         stimulus_A[int(step):int(step+stimulus_update_interval)] = rate_A
         stimulus_B[int(step):int(step+stimulus_update_interval)] = rate_B
+        noise_A[int(step):int(step+stimulus_update_interval)] = rate_noise_A
+        noise_B[int(step):int(step+stimulus_update_interval)] = rate_noise_B
         nest.Simulate(stimulus_update_interval)
 
     endsimulate = time.time()
@@ -356,7 +361,7 @@ def simulate_network(coherence = 51.2, order = 400, start_stim = 500.0, end_stim
     print("Building time     : %.2f s" % build_time)
     print("Simulation time   : %.2f s" % sim_time)    
 
-    return ret_vals, stimulus_A, stimulus_B
+    return ret_vals, stimulus_A, stimulus_B, noise_A, noise_B
 
 def main():
 
@@ -364,9 +369,9 @@ def main():
     start_stim = 500.0
     end_stim = 1000.0
 
-    results, stimulus_A, stimulus_B = simulate_network(simtime = simtime, start_stim = start_stim, end_stim = end_stim)     
+    results, stimulus_A, stimulus_B, noise_A, noise_B = simulate_network(simtime = simtime, start_stim = start_stim, end_stim = end_stim)     
 
-    return results, stimulus_A, stimulus_B
+    return results, stimulus_A, stimulus_B, noise_A, noise_B
 
 if __name__ == "__main__":
 	main()
