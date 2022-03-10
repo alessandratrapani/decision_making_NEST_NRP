@@ -146,11 +146,12 @@ def simulate_network(n_run=1,coherence = 51.2, order = 400, start_stim = 500.0, 
     #'''**********************************************************************************
     
     # Input stimulus
-    PG_input_NMDA_B = nest.Create("poisson_generator")
-    PG_input_AMPA_B = nest.Create("poisson_generator")
 
     PG_input_NMDA_A = nest.Create("poisson_generator")
     PG_input_AMPA_A = nest.Create("poisson_generator")
+
+    PG_input_NMDA_B = nest.Create("poisson_generator")
+    PG_input_AMPA_B = nest.Create("poisson_generator")
 
 
     nest.CopyModel("static_synapse", "excitatory_AMPA_input",
@@ -175,8 +176,9 @@ def simulate_network(n_run=1,coherence = 51.2, order = 400, start_stim = 500.0, 
 
     def update_poisson_stimulus(t):
 
-        rate_noise_B = np.random.normal(p_rate_ex, p_rate_ex/tuned_par['std_noise'][0])
+
         rate_noise_A = np.random.normal(p_rate_ex, p_rate_ex/tuned_par['std_noise'][0])
+        rate_noise_B = np.random.normal(p_rate_ex, p_rate_ex/tuned_par['std_noise'][0])        
         rate_noise_inh = np.random.normal(p_rate_in, p_rate_in/tuned_par['std_noise'][0])
         nest.SetStatus(PG_noise_to_A, "rate", rate_noise_A)
         nest.SetStatus(PG_noise_to_B, "rate", rate_noise_B)
@@ -198,6 +200,9 @@ def simulate_network(n_run=1,coherence = 51.2, order = 400, start_stim = 500.0, 
             nest.SetStatus(PG_input_NMDA_B, "rate", rate_B)
             print("stim on. rate_A={}, rate_B={}".format(rate_A, rate_B))
             print('trial number {}'.format(n_run))
+# TODO decision reversal
+        # if reversal:
+
 
         else:
             nest.SetStatus(PG_input_AMPA_A, "rate", 0.)

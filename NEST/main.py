@@ -14,7 +14,7 @@ t0 = nest.GetKernelStatus('time')
 
 save = False
 notes = 'C_0-0_'
-coherence = -0.128
+coherence = 0.0
 order = 400
 simtime = 3000.0
 start_stim = 500.0

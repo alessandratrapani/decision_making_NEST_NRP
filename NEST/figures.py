@@ -1,7 +1,7 @@
-#TODO 1 comparison NEST/Brian at 0%, 12.8%, 51.2% raster and activity (Hz)
+#TODO 1 0%, 12.8%, 51.2% raster and activity (Hz)
 
 #TODO 2 coint toss inuts --> mean and time integration 
-#TODO 3 comparison NEST/Brian COIN TOSS: raster+activity+decision space
+#TODO 3 COIN TOSS: raster+activity+decision space
 #TODO 4 n=1000 trials who's winning?+Delta S computation --> as figure3C
 
 #TODO 5 coin toss with 0 variability in the inputs
