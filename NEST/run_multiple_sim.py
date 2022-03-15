@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import nest
 import nest.raster_plot
 import os
-from simulate_network import *
+from simulate_network_p015 import *
 
 # @coherence= 0.0    --> A B (da wang circa 50%)
 # @coherence= 0.032  --> A B (da wang circa 55%)
@@ -28,9 +28,9 @@ end_stim = 1000.0
 
 show_fig = True
 save = False
-mult_coherence = [0.0, 0.032, 0.064, 0.128, 0.256, 0.512, 1., -0.032, -0.064, -0.128, -0.256, -0.512, -1.]
-# mult_coherence= [0.128]
-n_trial = 1
+#mult_coherence = [0.0, 0.032, 0.064, 0.128, 0.256, 0.512, 1., -0.032, -0.064, -0.128, -0.256, -0.512, -1.]
+mult_coherence= [0.0,-0.128, -0.256]
+n_trial = 3
 winner = np.zeros((len(mult_coherence),2))
 #TODO correggere valore frequenze  --> eventualmente aggiustare std 
 
