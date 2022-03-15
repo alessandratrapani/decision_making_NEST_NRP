@@ -146,28 +146,16 @@ def simulate_network(n_run=1,coherence = 51.2, order = 400, start_stim = 500.0, 
     #'''**********************************************************************************
     
     # Input stimulus
-    PG_input_NMDA_B = nest.Create("poisson_generator")
     PG_input_AMPA_B = nest.Create("poisson_generator")
-
-    PG_input_NMDA_A = nest.Create("poisson_generator")
     PG_input_AMPA_A = nest.Create("poisson_generator")
-
 
     nest.CopyModel("static_synapse", "excitatory_AMPA_input",
                 {"weight": J_norm_AMPA, "delay": fixed_pars['delay_AMPA'][0]})
     AMPA_input_syn = {"model": "excitatory_AMPA_input",
                     "receptor_type": 2} 
-    nest.CopyModel("static_synapse", "excitatory_NMDA_input",
-                {"weight": J_norm_NMDA, "delay": fixed_pars['delay_NMDA'][0]})
-    NMDA_input_syn = {"model": "excitatory_NMDA_input",
-                    "receptor_type": 3}  
   
-
     nest.Connect(PG_input_AMPA_A, pop_A, syn_spec=AMPA_input_syn)
-    nest.Connect(PG_input_NMDA_A, pop_A, syn_spec=NMDA_input_syn)
-
     nest.Connect(PG_input_AMPA_B, pop_B, syn_spec=AMPA_input_syn)
-    nest.Connect(PG_input_NMDA_B, pop_B, syn_spec=NMDA_input_syn)
 
     # Define the stimulus: two PoissonInput with time-dependent mean.
     mean_p_rate_stimulus=  p_rate_ex / tuned_par['ratio_stim_rate'][0]   #rate for the input Poisson generator to popA (scaled with respect to the noise)
@@ -196,17 +184,13 @@ def simulate_network(n_run=1,coherence = 51.2, order = 400, start_stim = 500.0, 
             #rate_B = mean_p_rate_stimulus
             
             nest.SetStatus(PG_input_AMPA_A, "rate", rate_A)
-            nest.SetStatus(PG_input_NMDA_A, "rate", rate_A)
             nest.SetStatus(PG_input_AMPA_B, "rate", rate_B)
-            nest.SetStatus(PG_input_NMDA_B, "rate", rate_B)
             print("stim on. rate_A={}, rate_B={}".format(rate_A, rate_B))
             print('trial number {}'.format(n_run))
 
         else:
             nest.SetStatus(PG_input_AMPA_A, "rate", 0.)
-            nest.SetStatus(PG_input_NMDA_A, "rate", 0.)
             nest.SetStatus(PG_input_AMPA_B, "rate", 0.)
-            nest.SetStatus(PG_input_NMDA_B, "rate", 0.)
 
             rate_A = 0.0
             rate_B = 0.0

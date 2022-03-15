@@ -19,7 +19,6 @@ dt_string = now.strftime("%Y-%m-%d_%H%M%S")
 # @coherence= -0.064 --> A B (da wang circa 70%)
 # @coherence= -0.128 --> A B (da wang circa 90%)
 # @coherence= -0.256 --> A B (da wang circa 100%)
-# @coherence= -0.512 --> A B (da wang circa 100%)
 # @coherence= -1.    --> A B (da wang100%)
 
 coherence = -0.128
@@ -31,7 +30,7 @@ end_stim = 1100.0
 show_fig = True
 save = False
 #mult_coherence = [0.0, 0.032, 0.064, 0.128, 0.256, 0.512, 1., -0.032, -0.064, -0.128, -0.256, -0.512, -1.]
-mult_coherence= [0.512]
+mult_coherence= [0.0]
 n_trial = 5
 winner = np.zeros((len(mult_coherence),2))
 
