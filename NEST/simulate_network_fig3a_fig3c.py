@@ -328,20 +328,29 @@ def simulate_network(n_run=1,coherence = 51.2, order = 400, start_stim = 500.0, 
     #'''**********************************************************************************
 
     endbuild = time.time()
+            
     
     sim_steps = np.arange(0, simtime, stimulus_update_interval)
     print(sim_steps)
     stimulus_A = np.zeros((int(simtime)))
     stimulus_B = np.zeros((int(simtime)))
+    sum_stimulus_A = np.zeros((int(simtime)))
+    sum_stimulus_B = np.zeros((int(simtime)))
 
     noise_A = np.zeros((int(simtime)))
     noise_B = np.zeros((int(simtime)))
-
+    sum_rate_A = 0
+    sum_rate_B = 0
+    
     for i, step in enumerate(sim_steps):
         print("Step number {} of {}".format(i+1, len(sim_steps)))
         rate_A, rate_B, rate_noise_A, rate_noise_B = update_poisson_stimulus(step)
         stimulus_A[int(step):int(step+stimulus_update_interval)] = rate_A
         stimulus_B[int(step):int(step+stimulus_update_interval)] = rate_B
+        sum_rate_A = sum_rate_A + rate_A
+        sum_rate_B = sum_rate_B + rate_B
+        sum_stimulus_A[int(step):int(step+stimulus_update_interval)] = sum_rate_A
+        sum_stimulus_B[int(step):int(step+stimulus_update_interval)] = sum_rate_B
         noise_A[int(step):int(step+stimulus_update_interval)] = rate_noise_A
         noise_B[int(step):int(step+stimulus_update_interval)] = rate_noise_B
         nest.Simulate(stimulus_update_interval)
@@ -364,7 +373,7 @@ def simulate_network(n_run=1,coherence = 51.2, order = 400, start_stim = 500.0, 
     print("Building time     : %.2f s" % build_time)
     print("Simulation time   : %.2f s" % sim_time)    
 
-    return ret_vals, stimulus_A, stimulus_B, noise_A, noise_B
+    return ret_vals, stimulus_A, stimulus_B, noise_A, noise_B, sum_stimulus_A, sum_stimulus_B
 
 def main():
 
@@ -372,9 +381,9 @@ def main():
     start_stim = 500.0
     end_stim = 1000.0
 
-    results, stimulus_A, stimulus_B, noise_A, noise_B = simulate_network(simtime = simtime, start_stim = start_stim, end_stim = end_stim)     
+    results, stimulus_A, stimulus_B, noise_A, noise_B, sum_stimulus_A, sum_stimulus_B = simulate_network(simtime = simtime, start_stim = start_stim, end_stim = end_stim)     
 
-    return results, stimulus_A, stimulus_B, noise_A, noise_B
+    return results, stimulus_A, stimulus_B, noise_A, noise_B, sum_stimulus_A, sum_stimulus_B
 
 if __name__ == "__main__":
 	main()
