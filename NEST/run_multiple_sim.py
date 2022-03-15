@@ -24,15 +24,15 @@ dt_string = now.strftime("%Y-%m-%d_%H%M%S")
 
 coherence = -0.128
 order = 400
-simtime = 3000.0
-start_stim = 500.0
-end_stim = 1500.0
+simtime = 2500.0
+start_stim = 100.0
+end_stim = 1100.0
 
 show_fig = True
-save = True
+save = False
 #mult_coherence = [0.0, 0.032, 0.064, 0.128, 0.256, 0.512, 1., -0.032, -0.064, -0.128, -0.256, -0.512, -1.]
-mult_coherence= [0.0, 0.128, 0.512]
-n_trial = 3
+mult_coherence= [0.512]
+n_trial = 5
 winner = np.zeros((len(mult_coherence),2))
 
 for i,coherence in enumerate(mult_coherence):

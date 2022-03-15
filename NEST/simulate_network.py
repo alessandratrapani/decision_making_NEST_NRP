@@ -374,7 +374,7 @@ def simulate_network(n_run=1,coherence = 51.2, order = 400, start_stim = 500.0, 
     print("Building time     : %.2f s" % build_time)
     print("Simulation time   : %.2f s" % sim_time)    
 
-    return ret_vals, stimulus_A/(order*2), stimulus_B/(order*2), noise_A/(order*2), noise_B/(order*2), sum_stimulus_A/(order*2), sum_stimulus_B/(order*2)
+    return ret_vals, stimulus_A, stimulus_B, noise_A, noise_B, sum_stimulus_A, sum_stimulus_B
 
 def main():
 
