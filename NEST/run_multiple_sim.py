@@ -28,9 +28,9 @@ start_stim = 100.0
 end_stim = 1100.0
 
 save = True
-#mult_coherence = [0.0, 0.032, 0.064, 0.128, 0.256, 0.512, 1., -0.032, -0.064, -0.128, -0.256, -0.512, -1.]
-mult_coherence= [-0.128, -0.512]
-n_trial = 10
+mult_coherence = [0.0, 0.032, 0.064, 0.128, 0.256, 0.512, 1., -0.032, -0.064, -0.128, -0.256, -0.512, -1.]
+#mult_coherence= [-0.512]
+n_trial = 100
 winner = np.zeros((len(mult_coherence),2))
 for i,coherence in enumerate(mult_coherence):
     win_A=0
@@ -111,7 +111,7 @@ for i,coherence in enumerate(mult_coherence):
 win = {'coherence': mult_coherence, 'pop A win': winner[:,0], 'pop B win': winner[:,1]}
 win = pd.DataFrame(win)
 win.to_csv('results/'+dt_string+'/'+dt_string+'_winners.csv')
-sim_info = {'n_trial':n_trial, 'sim time':simtime, 'start sim': start_stim, 'end sim': end_stim, 'order':order}
+sim_info = {'n_trial':n_trial, 'sim time':simtime, 'start sim': start_stim, 'end sim': end_stim, 'order':order, 'dt_rec':dt_rec}
 sim_info = pd.DataFrame(sim_info, index = ['value'])
 sim_info.to_csv('results/'+dt_string+'/'+dt_string+'_sim_info.csv')
 
