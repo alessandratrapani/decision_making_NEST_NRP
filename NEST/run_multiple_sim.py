@@ -27,13 +27,11 @@ simtime = 2500.0
 start_stim = 100.0
 end_stim = 1100.0
 
-show_fig = True
-save = False
+save = True
 #mult_coherence = [0.0, 0.032, 0.064, 0.128, 0.256, 0.512, 1., -0.032, -0.064, -0.128, -0.256, -0.512, -1.]
-mult_coherence= [0.0]
-n_trial = 5
+mult_coherence= [-0.128, -0.512]
+n_trial = 10
 winner = np.zeros((len(mult_coherence),2))
-
 for i,coherence in enumerate(mult_coherence):
     win_A=0
     win_B=0
@@ -88,48 +86,6 @@ for i,coherence in enumerate(mult_coherence):
             print('pop_A ', np.mean(A_N_A[-10:-1]))
             print('pop_B ', np.mean(B_N_B[-10:-1]))
 
-        
-        
-        fig = None
-        ax_raster = None
-        ax_rate = None
-        fig, (ax_raster, ax_rate, ax_stimuli,ax_noise) = plt.subplots(4, 1, sharex=True, figsize=(16,9))
-        plt.suptitle('Coherence ' + str(coherence*100) + '%')
-        
-        ax_raster.plot(tsA, evsA, ".", color='red', label ='pop A')
-        ax_raster.plot(tsB, evsB, ".", color='blue', label ='pop B')
-        ax_raster.set_ylabel("neuron #")
-        ax_raster.set_title("Raster Plot ", fontsize=10)
-        ax_raster.legend()
-        ax_rate.plot(t, A_N_A, color='red', label ='pop A')
-        ax_rate.fill_between(t, A_N_A, color='red')
-        ax_rate.plot(t, B_N_B, color='blue', label ='pop B')
-        ax_rate.fill_between(t, B_N_B, color='blue')
-        ax_rate.vlines(start_stim, 0, 40, color='grey')
-        ax_rate.vlines(end_stim, 0, 40, color='grey')
-        ax_rate.set_ylabel("A(t) [Hz]")
-        ax_rate.set_title("Activity", fontsize=10)
-        ax_rate.legend()
-        ax_stimuli.plot(np.arange(0., simtime),stimulus_A, 'red', label='stimulus on A')
-        ax_stimuli.plot(np.arange(0., simtime),stimulus_B, 'blue', label='stimulus on B')
-        ax_stimuli.legend()
-        ax_noise.plot(np.arange(0., simtime),noise_A, 'orange', label='noise on A')
-        ax_noise.plot(np.arange(0., simtime),noise_B, 'lightblue', label='noise on B')
-        ax_noise.legend()            
-        plt.xlabel("t [ms]")
-        
-
-        # decisional_space = plt.figure(figsize = [10,10])                
-        # plt.plot(A_N_A, B_N_B, color=c)
-        # plt.plot([0,40],[0,40], color='grey')
-        # plt.xlim(-0.1,40)
-        # plt.ylim(-0.1,40)
-        # plt.xlabel("Firing rate pop A (Hz)")
-        # plt.ylabel("Firing rate pop B (Hz)")
-        # plt.title("Decision Space")
-        if show_fig:
-            plt.show()
-
         if save:
             notes = 'coh_' + '0-'+ str(coherence)[2:] + '_trial_'+ str(j)
             saving_dir = 'results/'+dt_string+'/'+notes+'/'
@@ -156,10 +112,6 @@ win = {'coherence': mult_coherence, 'pop A win': winner[:,0], 'pop B win': winne
 win = pd.DataFrame(win)
 win.to_csv('results/'+dt_string+'/'+dt_string+'_winners.csv')
 sim_info = {'n_trial':n_trial, 'sim time':simtime, 'start sim': start_stim, 'end sim': end_stim, 'order':order}
-sim_info = pd.DataFrame(sim_info)
+sim_info = pd.DataFrame(sim_info, index = ['value'])
 sim_info.to_csv('results/'+dt_string+'/'+dt_string+'_sim_info.csv')
 
-print("win_A", win_A)
-print("win_B", win_B)
-print(winner)
-print(dt_string)
