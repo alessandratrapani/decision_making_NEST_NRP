@@ -24,13 +24,13 @@ dt_string = now.strftime("%Y-%m-%d_%H%M%S")
 coherence = -0.128
 order = 400
 simtime = 2500.0
-start_stim = 100.0
-end_stim = 1100.0
+start_stim = 200.0
+end_stim = 1200.0
 
-save = True
+save = False
 mult_coherence = [0.0, 0.032, 0.064, 0.128, 0.256, 0.512, 1., -0.032, -0.064, -0.128, -0.256, -0.512, -1.]
-#mult_coherence= [-0.512]
-n_trial = 100
+#mult_coherence= [0.0]
+n_trial = 1000
 winner = np.zeros((len(mult_coherence),2))
 for i,coherence in enumerate(mult_coherence):
     win_A=0
@@ -44,7 +44,7 @@ for i,coherence in enumerate(mult_coherence):
         nest.SetKernelStatus({"resolution": dt, "print_time": True, "overwrite_files": True})
         t0 = nest.GetKernelStatus('time')
 
-        results, stimulus_A, stimulus_B, noise_A, noise_B, sum_stimulus_A, sum_stimulus_B = simulate_network(j,coherence, order , start_stim , end_stim , simtime)     
+        results, stimulus_A, stimulus_B, noise_A, noise_B = simulate_network(j,coherence, order , start_stim , end_stim , simtime)     
 
         smA = nest.GetStatus(results["spike_monitor_A"])[0]
         rmA = nest.GetStatus(results["rate_monitor_A"])[0]	
@@ -70,19 +70,27 @@ for i,coherence in enumerate(mult_coherence):
         B_N_B = np.histogram(trmB, bins=bins)[0] / order*2 / dt_rec
         B_N_B = B_N_B*1000
 
+
+        int_stimulus_A = np.zeros((int(simtime)))
+        int_stimulus_B = np.zeros((int(simtime)))
+
+        for i in range(1,int(simtime)):
+            int_stimulus_A[i] = int_stimulus_A[i-1]+stimulus_A[i]
+            int_stimulus_B[i] = int_stimulus_B[i-1]+stimulus_B[i]
+
         if np.mean(A_N_A[-10:-1])>np.mean(B_N_B[-10:-1]):
             win_A = win_A + 1
             winner[i,0]=win_A
             c = 'red'
             #TODO check
-            delta_s_A_winner.append(sum_stimulus_A[-1] - sum_stimulus_B[-1])
+            delta_s_A_winner.append(int_stimulus_A[-1] - int_stimulus_B[-1])
             print('pop_A ', np.mean(A_N_A[-10:-1]))
             print('pop_B ', np.mean(B_N_B[-10:-1]))
         else:
             win_B = win_B + 1
             winner[i,1]=win_B
             c = 'blue'
-            delta_s_B_winner.append(sum_stimulus_A[-1] - sum_stimulus_B[-1])
+            delta_s_B_winner.append(int_stimulus_A[-1] - int_stimulus_B[-1])
             print('pop_A ', np.mean(A_N_A[-10:-1]))
             print('pop_B ', np.mean(B_N_B[-10:-1]))
 
@@ -95,7 +103,7 @@ for i,coherence in enumerate(mult_coherence):
             raster_A = {'ID neuron pop_A':evsA, 'event time pop_A':tsA}
             raster_B = { 'ID neuron pop_B':evsB, 'event time pop_B':tsB}
             activity = {'time':t,'activity (Hz) pop_A': A_N_A, 'activity (Hz) pop_B': B_N_B}
-            stimuli = {'stimulus pop A': stimulus_A,'stimulus pop B': stimulus_B, 'integral stim pop A': sum_stimulus_A,'integral stim pop B': sum_stimulus_B}
+            stimuli = {'stimulus pop A': stimulus_A,'stimulus pop B': stimulus_B, 'integral stim pop A': int_stimulus_A,'integral stim pop B': int_stimulus_B}
             
             events_A = pd.DataFrame(raster_A)
             events_B = pd.DataFrame(raster_B)
@@ -110,6 +118,8 @@ for i,coherence in enumerate(mult_coherence):
 
 win = {'coherence': mult_coherence, 'pop A win': winner[:,0], 'pop B win': winner[:,1]}
 win = pd.DataFrame(win)
+if not os.path.exists('results/'+dt_string+'/'):
+    os.makedirs('results/'+dt_string+'/')
 win.to_csv('results/'+dt_string+'/'+dt_string+'_winners.csv')
 sim_info = {'n_trial':n_trial, 'sim time':simtime, 'start sim': start_stim, 'end sim': end_stim, 'order':order, 'dt_rec':dt_rec}
 sim_info = pd.DataFrame(sim_info, index = ['value'])
