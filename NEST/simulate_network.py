@@ -31,7 +31,7 @@ def ComputePSPNorm(tau_mem, C_mem, tau_syn):
             ((np.exp( -t_max / tau_mem) - np.exp(-t_max / tau_syn)) / b - 
             t_max * np.exp(-t_max / tau_syn)))) 
 
-def simulate_network(n_run=1,coherence = 51.2, order = 400, start_stim = 500.0, end_stim = 1000.0, simtime = 3000.0, stimulus_update_interval = 25, fn_fixed_par = "fixed_parameters.csv", fn_tuned_par = "tuned_parameters.csv"):
+def simulate_network(n_run=1,coherence = 51.2, order = 400, start_stim = 500.0, end_stim = 1000.0, simtime = 3000.0, stimulus_update_interval = 25, fn_fixed_par = "fixed_parameters.csv", fn_tuned_par = "tuned_parameters.csv", rec_pop=1.):
     
     current_path = os.getcwd()+'/'
     fixed_pars = pd.read_csv(current_path+fn_fixed_par)
@@ -226,9 +226,9 @@ def simulate_network(n_run=1,coherence = 51.2, order = 400, start_stim = 500.0, 
 
     # data collection of a subset of neurons:
 
-    rate_monitor_A, spike_monitor_A,  idx_monitored_neurons_A = get_monitors(pop_A, len(pop_A))
-    rate_monitor_B, spike_monitor_B,  idx_monitored_neurons_B = get_monitors(pop_B, len(pop_B))
-
+    rate_monitor_A, spike_monitor_A,  idx_monitored_neurons_A = get_monitors(pop_A, rec_pop*len(pop_A))
+    rate_monitor_B, spike_monitor_B,  idx_monitored_neurons_B = get_monitors(pop_B, rec_pop*len(pop_B))
+    rate_monitor_inh, spike_monitor_inh,  idx_monitored_neurons_inh = get_monitors(pop_inh, rec_pop*len(pop_inh))
 
     #'''
     #'''**********************************************************************************
@@ -347,6 +347,10 @@ def simulate_network(n_run=1,coherence = 51.2, order = 400, start_stim = 500.0, 
     ret_vals["spike_monitor_B"] = spike_monitor_B
     ret_vals["idx_monitored_neurons_B"] = idx_monitored_neurons_B
 
+    ret_vals["rate_monitor_inh"] = rate_monitor_inh
+    ret_vals["spike_monitor_inh"] = spike_monitor_inh
+    ret_vals["idx_monitored_neurons_inh"] = idx_monitored_neurons_inh
+    
     build_time = endbuild - startbuild
     sim_time = endsimulate - endbuild
 

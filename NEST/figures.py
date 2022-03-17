@@ -2,11 +2,8 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import os
-save = True
-dt_string = '2022-03-15_150803'
-coherence = 0.512
-trial = 5
-
+save = False
+dt_string = '2022-03-15_231909'
 results_directory = os.getcwd()+'/results/'+dt_string+'/'
 
 sim_info = pd.read_csv(results_directory+dt_string+'_sim_info.csv')
@@ -15,8 +12,8 @@ start_stim = sim_info['start sim'].to_numpy()
 end_stim = sim_info['end sim'].to_numpy()
 order = sim_info['order'].to_numpy()
 n_trial = sim_info['n_trial'].to_numpy()
-#dt_rec = sim_info['dt_rec'].to_numpy()
-dt_rec = 10
+dt_rec = sim_info['dt_rec'].to_numpy()
+#dt_rec = 10
 
 def extract_results(dt_string, coherence, trial, pop):
     results_directory = os.getcwd()+'/results/'+dt_string+'/'
@@ -39,14 +36,18 @@ figure_1 = True
 figure_2a = True
 figure_2b = True
 figure_2c = True
-figure_5 = True
-# %% FIGURE_1 
-#0.0 t4-8
-#0.128 t3-4-6-7-9(best)
-#0.512 t1-3-5(best)
-#-0.512 t3-5
-#-0.128 t0-1
+figure_5 = False
+
+#%%FIGURE_0
+# schematic of network with the info on the simulus and noise
+# FIGURE_0a top large panel --> schematic of the network
+# FIGURE_0b Gaussian distribution of the stimulus for 2/3 coherence levels
+# FIGURE_0c Mean stimulus (same 2/3 coherence?) and noise (2 y axis diff scale) 
+
+#%% FIGURE_1 
 if figure_1:
+    coherence = 0.0
+    trial = 4
     fig= None
     ax_raster = None
     ax_rate = None
@@ -88,7 +89,10 @@ if figure_1:
     else:
         plt.show() 
 
-# %%FIGURE_2
+#TODO Activity of inhibitory Neurons 
+#TODO hard decision vs easy decision --> decisional space
+#%% FIGURE_2
+
 #FIGURE2A
 if figure_2a:
     fig = None
@@ -168,6 +172,10 @@ if figure_2a:
         plt.show() 
     
 # FIGURE2B
+# decisional_space
+#TODO prova mediare su più trial
+
+#TODO color coded: before stimulus, first 500 ms, after 500ms of stimulus, delayed period
 if figure_2b:
     fig, decisional_space = plt.subplots(1,1,figsize = [5,5])
 
@@ -210,6 +218,7 @@ if figure_2b:
         plt.show()
 
 #FIGURE2C
+#delta_s_A/B_winner
 if figure_2c:
     
     delta_s_A_winner = np.array([])
@@ -240,10 +249,24 @@ if figure_2c:
         plt.close()
     else:
         plt.show()
+
+#%% FIGURE_3
 #TODO 5 coin toss with 0 variability in the inputs
 
+#%% FIGURE_4
+# FIGURE4a
 #TODO 6 network performance and error trials Fig4a
-#TODO 7 evaluate the network time courses at: 3.2%, 6.4%,12.8%, 25.6% Fig4b (n trials=1000 and take the mean)
+def weib(c,alpha,beta):
+    return 1-0.5*np.exp(-(c/alpha)**beta)
+# with std diverso e uguale a zero n_1000 trial 
+
+#FIGURE4b   
+#TODO 7 evaluate the network time courses at: 3.2%, 6.4%, 12.8%, 25.6% Fig4b (n trials=1000 and take the mean)
+# n_ trial 200 per ogni coherence
+# solid curve black: time course of pop A winning with stimulus on A
+# dashed curve black: time course of pop A winning when stimulus on B
+# solid curve orange: time course of pop A losing with stimulus on B
+# dashed curve orange: time course of pop A losing with stimulus on A
 
 #%% FIGURE_5
 # compare 0.0% and 51.2% --> time that it take to cross the 15Hz threshold (figure 5a-b) --> need to find a linear relationship between mean reaction time and log coherence level
@@ -258,6 +281,7 @@ if figure_5:
         notes, evsB, tsB, t, B_N_B, stimulus_B, sum_stimulus_B = extract_results(dt_string, coherence, j, 'B')
         ind_start_stim = int(start_stim/dt_rec)
         ind_end_stim = int(end_stim/dt_rec)
+        #TODO maybe better to show the mean/median 
         if np.mean(A_N_A[-10:-1])>np.mean(B_N_B[-10:-1]):
             rate_51.plot(t[ind_start_stim:ind_end_stim], A_N_A[ind_start_stim:ind_end_stim], color='black', label ='pop A')
             rate_51.hlines(15, start_stim, end_stim, 'grey')
@@ -276,6 +300,7 @@ if figure_5:
             rate_0.set_ylabel("A(t) [Hz]")
             rate_0.set_xlabel("Time [ms]")
             decision_time_0=np.append(decision_time_0,t[A_N_A >= 15][0])
+
     counts_51.hist(decision_time_51, histtype = 'step', color = 'black', linewidth = 2)
     counts_51.set_xlim(0,1000)
     counts_51.set_ylim(0, n_trial)
@@ -295,13 +320,49 @@ if figure_5:
     else:
         plt.show()
 
-
+#%% FIGURE_6
 #TODO 9 test stimulus duration fig6A
 
-#TODO 10 test persistent activity --> decrease recurrent exc weights -> again 0 12.8 51.2
-# da notare: no ramping, no winner takes all a 0.0, no persistent activity.
+#%% FIGURE_7
+#TODO 10 test persistent activity 
+# FIGURE7a: basta un trial per ciascuna coerenza --> mostro activity e raster come fig 1
+# decrease recurrent exc weights ->  1.6 51.2
+# da notare: no ramping, no winner takes all a 1.6, no persistent activity.
+# FIGURE7b: n 100 a 6.4 abbiamo già quelli di controllo per figure 4a da aggingere per pesi aumentati
+# increase recurrent exc weights -> at 6.4
+# Network behavior with an increased strength of recurrent connections (w_plus 1.8). With stronger excitatory reverberations,
+# persistent activity level is doubled (from 20 Hz in control to 40 Hz), and the integration time of stimulus is shortened by a half.
+# The performance is reduced from 72% to 60% correct at c 6.4%. 
 
-#TODO 11 testare NMDA slow reverberation --> switch off?
+#%% FIGURE_8
+#TODO 11 testare NMDA slow reverberation --> due prove: tolgo del tutto connesioni recurrent NMDA (metto a 0 w_plus_NMDA) o le trasformo in AMPA (stessa dinamica tau e delay)
 
+#%% FIGURE_9
 #TODO 12 reverse decision --> possibilità di cambiare quando avviene lo stimolo reverse (Percentage choices for A and B as function of the onset time of reversal.Fig8A Even when the signal is reversed 1 s after the stimulus onset, the decision is still re- versable by a more powerful input. Percent- age choices for A and B as function of the coherence level of the reversed signalFig8B
 #coherence above 70%–80%
+# FIGURE9a
+# The input signal is reversed during stimulation, where the signal strength is weak
+# (6.4%) and the same before and after the reversal. Percentage choices for A and B as Function of the onset time of reversal. The
+# dependence is initially linear as a function of the time of reversal, consistent with an integration of the first and second inputs of the
+# opposite signs. However, the behavioral performance is no longer affected if signal reversal occurs too late (e.g., the reversal time is
+# larger than 700 ms after the stimulus onset), when the network becomes dominated by the intrinsic attractor dynamics.
+# FIGURE9B
+# Even when the signal is reversed 1 s after the stimulus onset, the decision is still reversable by a more powerful input. Percentage choices for A and B as function of the
+# coherence level of the reversed signal. When the new input is sufficiently large (coherence above 70%–80%), the decision is always reversed in favor of the “new evidence.”
+# FIGURE9c
+# Activity plot showing the reversing of the decision + stimlus in input with zero variability?
+#%% FIGURE_1 supp
+#straigh comparison with Wang 2002
+#TODO Activity at different coherence level
+
+#%% FIGURE_2 supp
+#TODO what happen if put zero variance in the inputs (4 subfigure)--> show just activity (tot A winning hold on tot B winning (50/50) --> different alpha value)
+
+#%% FIGURE_3 supp
+#differenze con Wang 2002
+
+#FIGURE3asupp
+#TODO fully connected p015
+
+#FIGURE3bsupp
+#TODO no stimulus to inhibitory pop
