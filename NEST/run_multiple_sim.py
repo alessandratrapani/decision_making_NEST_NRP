@@ -82,17 +82,12 @@ for i,coherence in enumerate(mult_coherence):
             win_A = win_A + 1
             winner[i,0]=win_A
             c = 'red'
-            #TODO check
             delta_s_A_winner.append(int_stimulus_A[-1] - int_stimulus_B[-1])
-            print('pop_A ', np.mean(A_N_A[-10:-1]))
-            print('pop_B ', np.mean(B_N_B[-10:-1]))
         else:
             win_B = win_B + 1
             winner[i,1]=win_B
             c = 'blue'
             delta_s_B_winner.append(int_stimulus_A[-1] - int_stimulus_B[-1])
-            print('pop_A ', np.mean(A_N_A[-10:-1]))
-            print('pop_B ', np.mean(B_N_B[-10:-1]))
 
         if save:
             notes = 'coh_' + '0-'+ str(coherence)[2:] + '_trial_'+ str(j)
