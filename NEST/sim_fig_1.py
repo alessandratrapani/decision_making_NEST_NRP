@@ -130,7 +130,7 @@ if figure1abcd:
 if figure1ed:
     fig_1d, ax_rate_in = plt.subplots(1, 1,  figsize=(3,3))
     mult_coherence = [0.0, 0.128, 0.512]
-    n_trial = 100
+    n_trial = 10
     winner = np.zeros((len(mult_coherence),2))
     for i,coherence in enumerate(mult_coherence):
         win_A=0
