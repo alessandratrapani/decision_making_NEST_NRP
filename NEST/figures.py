@@ -36,6 +36,7 @@ figure_1 = True
 figure_2a = True
 figure_2b = True
 figure_2c = True
+figure_3=True
 figure_5 = False
 
 #%%FIGURE_0
@@ -251,7 +252,7 @@ if figure_2c:
         plt.show()
 
 #%% FIGURE_3
-#TODO 5 coin toss with 0 variability in the inputs
+#TODO coin toss 
 
 #%% FIGURE_4
 # FIGURE4a

@@ -19,8 +19,9 @@ start_stim = 200.0
 end_stim = 1200.0
 dt = 0.1
 dt_rec = 10.0
-rec_pop = 0.5
 
+if not os.path.exists('results/'+fig_n+'/'):
+    os.makedirs('results/'+fig_n+'/')
 
 if figure_2a:
     fig_2a, ((ax_rate_A_0,ax_rate_B_0),(ax_rate_A_51,ax_rate_B_51)) = plt.subplots(2, 2, sharex=True,  figsize=(5,3))
@@ -72,7 +73,7 @@ if figure_2a:
 
     activity = {'time':t,'activity (Hz) pop_A': A_N_A, 'activity (Hz) pop_B': B_N_B}
     frequency = pd.DataFrame(activity)    
-    frequency.to_csv(saving_dir+notes+'coh_0-'+ str(coherence)[2:]+'_frequency.csv')
+    frequency.to_csv(saving_dir+notes+'c'+str(coherence)+'_frequency.csv')
 
     nest.ResetKernel()
     nest.SetKernelStatus({"resolution": dt, "print_time": True, "overwrite_files": True})
@@ -107,7 +108,7 @@ if figure_2a:
     
     activity = {'time':t,'activity (Hz) pop_A': A_N_A, 'activity (Hz) pop_B': B_N_B}
     frequency = pd.DataFrame(activity)    
-    frequency.to_csv(saving_dir+'coh_0-'+ str(coherence)[2:]+'_frequency.csv') 
+    frequency.to_csv(saving_dir+'c'+str(coherence)+'_frequency.csv') 
 
     coherence = 0.512
 
@@ -152,7 +153,7 @@ if figure_2a:
 
     activity = {'time':t,'activity (Hz) pop_A': A_N_A, 'activity (Hz) pop_B': B_N_B}
     frequency = pd.DataFrame(activity)    
-    frequency.to_csv(saving_dir+notes+'coh_0-'+ str(coherence)[2:]+'_frequency.csv')
+    frequency.to_csv(saving_dir+notes+'c'+str(coherence)+'_frequency.csv')
 
     nest.ResetKernel()
     nest.SetKernelStatus({"resolution": dt, "print_time": True, "overwrite_files": True})
@@ -189,9 +190,9 @@ if figure_2a:
 
     activity = {'time':t,'activity (Hz) pop_A': A_N_A, 'activity (Hz) pop_B': B_N_B}
     frequency = pd.DataFrame(activity)    
-    frequency.to_csv(saving_dir+'coh_0-'+ str(coherence)[2:]+'_frequency.csv')
+    frequency.to_csv(saving_dir+'c'+str(coherence)+'_frequency.csv')
 
-    fig_2a.savefig(saving_dir+'Figure2a.eps' , bbox_inches='tight')
+    fig_2a.savefig('results/'+fig_n+'/'+'Figure2a.eps' , bbox_inches='tight')
     plt.close()
 
 if figure_2b: 
@@ -246,7 +247,7 @@ if figure_2c:
 
     activity = {'time':t,'activity (Hz) pop_A': A_N_A, 'activity (Hz) pop_B': B_N_B}
     frequency = pd.DataFrame(activity)    
-    frequency.to_csv(saving_dir+notes+'coh_0-'+ str(coherence)[2:]+'_frequency.csv')
+    frequency.to_csv(saving_dir+notes+'c'+str(coherence)+'_frequency.csv')
 
 
     nest.ResetKernel()
@@ -282,7 +283,7 @@ if figure_2c:
 
     activity = {'time':t,'activity (Hz) pop_A': A_N_A, 'activity (Hz) pop_B': B_N_B}
     frequency = pd.DataFrame(activity)    
-    frequency.to_csv(saving_dir+'coh_0-'+ str(coherence)[2:]+'_frequency_2.csv')
+    frequency.to_csv(saving_dir+'c'+str(coherence)+'_frequency_2.csv')
 
     coherence = 0.512
 
@@ -327,7 +328,7 @@ if figure_2c:
 
     activity = {'time':t,'activity (Hz) pop_A': A_N_A, 'activity (Hz) pop_B': B_N_B}
     frequency = pd.DataFrame(activity)    
-    frequency.to_csv(saving_dir+notes+'coh_0-'+ str(coherence)[2:]+'_frequency.csv')
+    frequency.to_csv(saving_dir+notes+'c'+str(coherence)+'_frequency.csv')
 
     nest.ResetKernel()
     nest.SetKernelStatus({"resolution": dt, "print_time": True, "overwrite_files": True})
@@ -364,11 +365,10 @@ if figure_2c:
 
     activity = {'time':t,'activity (Hz) pop_A': A_N_A, 'activity (Hz) pop_B': B_N_B}
     frequency = pd.DataFrame(activity)    
-    frequency.to_csv(saving_dir+'coh_0-'+ str(coherence)[2:]+'_frequency_2.csv')
+    frequency.to_csv(saving_dir+'c'+str(coherence)+'_frequency_2.csv')
     
     notes = 'no_NMDA'
     saving_dir = 'results/'+fig_n+'/'+notes+'/'
-    if not os.path.exists(saving_dir):
-        os.makedirs(saving_dir)
-    fig_2c.savefig(saving_dir+'Figure2c.eps' , bbox_inches='tight')
+
+    fig_2c.savefig('results/'+fig_n+'/Figure2c.eps' , bbox_inches='tight')
     plt.close()
