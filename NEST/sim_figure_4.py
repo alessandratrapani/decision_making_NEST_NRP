@@ -65,8 +65,8 @@ if figure_4b:
     fig,ax4b = plt.subplots(4,1,figsize = [5,10])
     dt_string = 'standard/'
     #DA SETTARE
-    mult_coherence = [0.0,0.032]
-    n_trial = 3
+    mult_coherence = [0.0,0.032, 0.064, 0.128]
+    n_trial = 200
     for i,coherence in enumerate(mult_coherence):
         mean_activity_wB_sB = []
         mean_activity_wA_sB = []
@@ -89,14 +89,14 @@ if figure_4b:
             
         mean_activity_wB_sB = np.mean(mean_activity_wB_sB,axis=0)
         mean_activity_wA_sB = np.mean(mean_activity_wA_sB,axis=0)
-        mean_activity_wB_sB = signal.medfilt(mean_activity_wB_sB,55)
-        mean_activity_wA_sB = signal.medfilt(mean_activity_wA_sB,55)
+        mean_activity_wB_sB = signal.medfilt(mean_activity_wB_sB,35)
+        mean_activity_wA_sB = signal.medfilt(mean_activity_wA_sB,35)
         
-        ax4b[i].plot(t,mean_activity_wB_sB,'black')
-        ax4b[i].plot(t,mean_activity_wA_sB,'orange','--',alpha=0.6)
+        ax4b[i].plot(t[0:120],mean_activity_wB_sB[0:120],'black')
+        ax4b[i].plot(t[0:120],mean_activity_wA_sB[0:120],'orange','--',alpha=0.6)
 
     #DA SETTARE
-    mult_coherence = [-0.032,0.0]
+    mult_coherence = [0.0,0-.032, -0.064, -0.128]
     for i,coherence in enumerate(mult_coherence):
         mean_activity_wB_sA = []
         mean_activity_wA_sA = []
@@ -120,12 +120,13 @@ if figure_4b:
         
         mean_activity_wB_sA = np.mean(mean_activity_wB_sA,axis=0)
         mean_activity_wA_sA = np.mean(mean_activity_wA_sA,axis=0)
-        mean_activity_wB_sA = signal.medfilt(mean_activity_wB_sA,55)
-        mean_activity_wA_sA = signal.medfilt(mean_activity_wA_sA,55)
+        mean_activity_wB_sA = signal.medfilt(mean_activity_wB_sA,35)
+        mean_activity_wA_sA = signal.medfilt(mean_activity_wA_sA,35)
         
-        ax4b[i].plot(t,mean_activity_wB_sA,'black', '--',alpha=0.6)
-        ax4b[i].plot(t,mean_activity_wA_sA,'orange')
+        ax4b[i].plot(t[0:120],mean_activity_wB_sA[0:120],'black', '--',alpha=0.6)
+        ax4b[i].plot(t[0:120],mean_activity_wA_sA[0:120],'orange')
     
+        ax4b[i].set_ylim(0,40)
     if save:
         fig.savefig('figures/'+fig_n+'/Figure4B.png' , bbox_inches='tight')
         plt.close()

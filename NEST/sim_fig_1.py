@@ -14,7 +14,7 @@ dt = 0.1
 dt_rec = 10.0
 
 figure1abc = True
-figure1ed = False
+figure1ed = True
 
 fig_n = 'Figure1'
 if not os.path.exists('figures/'+fig_n+'/'):
@@ -24,12 +24,12 @@ if run_1:
     run_multiple_sim(n_trial = 200)
 
 if figure1abc:
-    fig1a,axes = plt.subplots(6, 2,  figsize=(5,10))
+    fig1a,axes = plt.subplots(6, 2,  figsize=(6,10))
     fig1d,ax = plt.subplots(1, 1,  figsize=(3,3))
     fig1e,ax1e = plt.subplots(1, 1,  figsize=(3,3))
     mult_coherence = [0.0,-0.128,-0.512]
     #DA SETTARE
-    trial = [0,0,1]
+    trial = [158,199,6]
     for i, coherence in enumerate(mult_coherence):
         j = trial[i]
         win_pop = 'A_win'
@@ -53,6 +53,7 @@ if figure1abc:
         axes[2*i+1][0].vlines(end_stim, 0, 40, color='grey')
         axes[2*i+1][0].set_ylabel("A(t) [Hz]")
         axes[2*i+1][0].set_title("Activity Pop A", fontsize=10)
+        axes[2*i+1][0].set_ylim(0,60)
 
         axes[2*i][1].scatter(tsB, evsB,marker= '|',  linewidths = 0.8,color='blue', label ='pop B')
         axes[2*i][1].set_ylabel("neuron #")
@@ -65,6 +66,7 @@ if figure1abc:
         axes[2*i+1][1].vlines(end_stim, 0, 40, color='grey')
         axes[2*i+1][1].set_ylabel("A(t) [Hz]")
         axes[2*i+1][1].set_title("Activity Pop B", fontsize=10)
+        axes[2*i+1][1].set_ylim(0,60)
         plt.xlabel("t [ms]")
 
     ax.set_ylabel("A(t) [Hz]")

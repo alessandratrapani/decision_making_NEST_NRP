@@ -26,9 +26,9 @@ if run:
 
 
 fig_5a, axes = plt.subplots(1, 2,  figsize=(3,3))
-fig_5b, axesb = plt.subplots(1, 2,  figsize=(3,3))
+fig_5b, axesb = plt.subplots(1, 1,  figsize=(3,3))
 n_trial = 200
-mult_coherence = [0.0,0.032]
+mult_coherence = [0.0,0.512]
 win_pop = 'B_win'
 thr_activity = 15
 
@@ -48,11 +48,12 @@ for i,coherence in enumerate(mult_coherence):
             axes[i].set_xlabel("Time [ms]")
             decision_time.append(t[B_N_B >= thr_activity][0])  
 
-    axesb[i].hist(decision_time, histtype = 'step', color = 'black', linewidth = 2)
+    axesb.hist(decision_time, color = [0.5-i*0.3,0.4-i*0.3,0.5-i*0.3], linewidth = 2)
+
     # axesb[i].set_xlim(0,200)
     # axesb[i].set_ylim(0, n_trial)
-    axesb[i].set_xlabel('Decision time [ms]')
-    axesb[i].set_ylabel('Counts #')
+    axesb.set_xlabel('Decision time [ms]')
+    axesb.set_ylabel('Counts #')
 
     B_N_B_mean = np.mean(B_N_B_mean,axis=0)
     axes[i].plot(t[ind_start_stim:ind_end_stim], B_N_B_mean[ind_start_stim:ind_end_stim], color='green', label ='pop B')

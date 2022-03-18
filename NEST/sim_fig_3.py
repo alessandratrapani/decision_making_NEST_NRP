@@ -8,8 +8,8 @@ import os
 fig_n = 'Figure3'
 run = False
 figure_3a = True
-figure_3b = False
-figure_3c = False
+figure_3b = True
+figure_3c = True
 start_stim = 200.0
 end_stim = 1200.0
 simtime = 2500.0
@@ -34,7 +34,7 @@ if figure_3a:
 
     win_pop = 'A_win'
     #DA SCEGLIERE
-    j = 1
+    j = 158
     path = 'results/'+dt_string+'c'+str(coherence) +'/'+win_pop+ '/trial_'+ str(j)+'/'
     evsA, tsA, t, A_N_A, stimulus_A, sum_stimulus_A = extract_results(path, 'A')
     evsB, tsB, t, B_N_B, stimulus_B, sum_stimulus_B = extract_results(path, 'B')
@@ -67,7 +67,7 @@ if figure_3a:
 
     win_pop = 'B_win'
     #DA SCEGLIERE
-    j = 0
+    j = 146
     path = 'results/'+dt_string+'c'+str(coherence) +'/'+win_pop+ '/trial_'+ str(j)+'/'
     evsA, tsA, t, A_N_A, stimulus_A, sum_stimulus_A = extract_results(path, 'A')
     evsB, tsB, t, B_N_B, stimulus_B, sum_stimulus_B = extract_results(path,'B')
