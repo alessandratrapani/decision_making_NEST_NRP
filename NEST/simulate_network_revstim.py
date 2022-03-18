@@ -383,7 +383,7 @@ def main():
     start_stim = 500.0
     end_stim = 1000.0
 
-    results, stimulus_A, stimulus_B, noise_A, noise_B = simulate_network(simtime = simtime, start_stim = start_stim, end_stim = end_stim)     
+    results, stimulus_A, stimulus_B, noise_A, noise_B = simulate_network_revstim(simtime = simtime, start_stim = start_stim, end_stim = end_stim)     
 
     return results, stimulus_A, stimulus_B, noise_A, noise_B
 

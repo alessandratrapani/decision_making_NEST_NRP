@@ -139,7 +139,7 @@ if run_t_reverse:
         delta_s_A_winner.to_csv(results_dir+'/t_rev'+str(t_rev) +'/delta_s_A_winner.csv')
         delta_s_B_winner.to_csv(results_dir+'/t_rev'+str(t_rev) +'/delta_s_B_winner.csv')
 
-    win = {'coherence': multiple_t_rev, 'pop A win': winner[:,0], 'pop B win': winner[:,1]}
+    win = {'t_rev': multiple_t_rev, 'pop A win': winner[:,0], 'pop B win': winner[:,1]}
     win = pd.DataFrame(win)
     win.to_csv(results_dir+'winners.csv')
     sim_info = {'n_trial':n_trial, 'sim time':simtime, 'start sim': start_stim, 'end sim': end_stim, 'order':order, 'dt_rec':dt_rec}
@@ -235,7 +235,7 @@ if run_stim_reverse:
             events_inh.to_csv(saving_dir+'events_pop_inh.csv')
             stimuli.to_csv(saving_dir+'stimuli.csv')
 
-    win = {'coherence': multiple_stim_rev, 'pop A win': winner[:,0], 'pop B win': winner[:,1]}
+    win = {'sti_rev': multiple_stim_rev, 'pop A win': winner[:,0], 'pop B win': winner[:,1]}
     win = pd.DataFrame(win)
     win.to_csv(results_dir+'winners.csv')
     sim_info = {'n_trial':n_trial, 'sim time':simtime, 'start sim': start_stim, 'end sim': end_stim, 'order':order, 'dt_rec':dt_rec}
@@ -249,7 +249,7 @@ if figure7a:
     winner = pd.read_csv(results_dir+'winners.csv')
     n_trial=1
     
-    coherence_level = winner['coherence'].to_numpy()
+    coherence_level = winner['t_rev'].to_numpy()
     pop_A_win = 100*(winner['pop A win'].to_numpy())/n_trial
     pop_B_win = 100*(winner['pop B win'].to_numpy())/n_trial
 
@@ -270,7 +270,7 @@ if figure7b:
     results_dir = 'results/stim_reverse/'
     winner = pd.read_csv(results_dir+'winners.csv')
     
-    coherence_level = winner['coherence'].to_numpy()*100
+    coherence_level = winner['sti_rev'].to_numpy()*100
     pop_A_win = 100*(winner['pop A win'].to_numpy())/n_trial
     pop_B_win = 100*(winner['pop B win'].to_numpy())/n_trial
 
