@@ -226,9 +226,9 @@ def simulate_network(n_run=1,coherence = 51.2, order = 400, start_stim = 500.0, 
 
     # data collection of a subset of neurons:
 
-    rate_monitor_A, spike_monitor_A,  idx_monitored_neurons_A = get_monitors(pop_A, rec_pop*len(pop_A))
-    rate_monitor_B, spike_monitor_B,  idx_monitored_neurons_B = get_monitors(pop_B, rec_pop*len(pop_B))
-    rate_monitor_inh, spike_monitor_inh,  idx_monitored_neurons_inh = get_monitors(pop_inh, rec_pop*len(pop_inh))
+    rate_monitor_A, spike_monitor_A,  idx_monitored_neurons_A = get_monitors(pop_A, int(rec_pop*len(pop_A)))
+    rate_monitor_B, spike_monitor_B,  idx_monitored_neurons_B = get_monitors(pop_B, int(rec_pop*len(pop_B)))
+    rate_monitor_inh, spike_monitor_inh,  idx_monitored_neurons_inh = get_monitors(pop_inh, int(rec_pop*len(pop_inh)))
 
     #'''
     #'''**********************************************************************************

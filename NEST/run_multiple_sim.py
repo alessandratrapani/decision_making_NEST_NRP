@@ -68,9 +68,9 @@ def run_multiple_sim(results_dir = 'results/standard/',
             int_stimulus_A = np.zeros((int(simtime)))
             int_stimulus_B = np.zeros((int(simtime)))
 
-            for i in range(1,int(simtime)):
-                int_stimulus_A[i] = int_stimulus_A[i-1]+stimulus_A[i]
-                int_stimulus_B[i] = int_stimulus_B[i-1]+stimulus_B[i]
+            for n in range(1,int(simtime)):
+                int_stimulus_A[n] = int_stimulus_A[n-1]+stimulus_A[n]
+                int_stimulus_B[n] = int_stimulus_B[n-1]+stimulus_B[n]
 
             if np.mean(A_N_A[-10:-1])>np.mean(B_N_B[-10:-1]):
                 win_A = win_A + 1
@@ -106,15 +106,15 @@ def run_multiple_sim(results_dir = 'results/standard/',
             events_A.to_csv(saving_dir+'events_pop_A.csv')
             events_B.to_csv(saving_dir+'events_pop_B.csv')
             frequency.to_csv(saving_dir+'frequency.csv')
-            events_inh.to_csv(saving_dir+notes+'_events_pop_inh.csv')
+            events_inh.to_csv(saving_dir+'_events_pop_inh.csv')
             stimuli.to_csv(saving_dir+'stimuli.csv')
 
         delta_s_A_winner = {'delta_s_A_winner':delta_s_A_winner}
         delta_s_B_winner = {'delta_s_B_winner':delta_s_B_winner}
         delta_s_A_winner = pd.DataFrame(delta_s_A_winner)
         delta_s_B_winner = pd.DataFrame(delta_s_B_winner)
-        delta_s_A_winner.to_csv(results_dir+'/coh_0-'+ str(coherence)[2:] +'/delta_s_A_winner.csv')
-        delta_s_B_winner.to_csv(results_dir+'/coh_0-'+ str(coherence)[2:] +'/delta_s_B_winner.csv')
+        delta_s_A_winner.to_csv(results_dir+'c'+str(coherence) +'/delta_s_A_winner.csv')
+        delta_s_B_winner.to_csv(results_dir+'c'+str(coherence) +'/delta_s_B_winner.csv')
 
     win = {'coherence': mult_coherence, 'pop A win': winner[:,0], 'pop B win': winner[:,1]}
     win = pd.DataFrame(win)
