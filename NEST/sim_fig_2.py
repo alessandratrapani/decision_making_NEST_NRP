@@ -10,9 +10,9 @@ fig_n = 'Figure2'
 run_1 = False
 run_2 = False
 
-figure_2a = False
+figure_2a = True
 figure_2b = False
-figure_2c = True
+figure_2c = False
 
 order = 400
 simtime = 3000.0
@@ -20,7 +20,7 @@ start_stim = 200.0
 end_stim = 1200.0
 dt = 0.1
 dt_rec = 10.0
-n_trial=3
+n_trial=100
 
 if not os.path.exists('figures/'+fig_n+'/'):
     os.makedirs('figures/'+fig_n+'/')
@@ -33,7 +33,7 @@ if run_1:
 if figure_2a:
     fig_2a, axes = plt.subplots(2, 2, sharey=True,sharex=True,  figsize=(5,3))
     win_pop ='B_win'
-    mult_coherence = [0.0]#, 0.512]
+    mult_coherence = [0.0, 0.512]
 
     for i, coherence in enumerate(mult_coherence):
         B_N_B_mean_decrease =[]
