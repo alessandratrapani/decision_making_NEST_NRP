@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from run_multiple_sim import *
 import os
+import scipy.signal as signal
 # FIGURE5: comparison reaction time
 # sim 200 0.0, 200 51.2
 # a) activity 0.0 (intorno stimulus)	activity 51.2 (intorno stimulus)
@@ -40,7 +41,8 @@ for i,coherence in enumerate(mult_coherence):
         path = 'results/'+dt_string+'c'+str(coherence) +'/'+win_pop+ '/trial_'+ str(j) +'/'
         if os.path.exists(path):
             evsB, tsB, t, B_N_B, stimulus_B, sum_stimulus_B = extract_results(path, 'B')
-            B_N_B_mean.append(B_N_B)  
+            B_N_B_mean.append(B_N_B)            
+            B_N_B = signal.medfilt(B_N_B,35)  
             axes[i].plot(t[ind_start_stim:ind_end_stim], B_N_B[ind_start_stim:ind_end_stim], color='black', label ='pop B')
             axes[i].hlines(15, start_stim, end_stim, 'grey')
             axes[i].set_ylim(0,30)
@@ -56,6 +58,7 @@ for i,coherence in enumerate(mult_coherence):
     axesb.set_ylabel('Counts #')
 
     B_N_B_mean = np.mean(B_N_B_mean,axis=0)
+    B_N_B_mean = signal.medfilt(B_N_B_mean,35)
     axes[i].plot(t[ind_start_stim:ind_end_stim], B_N_B_mean[ind_start_stim:ind_end_stim], color='green', label ='pop B')
             
     if save:
