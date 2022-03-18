@@ -18,8 +18,8 @@ dt_rec = 10.0
 ind_start_stim = int(start_stim/dt_rec)
 ind_end_stim = int(end_stim/dt_rec)
 
-if not os.path.exists('results/'+fig_n+'/'):
-    os.makedirs('results/'+fig_n+'/')
+if not os.path.exists('figures/'+fig_n+'/'):
+    os.makedirs('figures/'+fig_n+'/')
 
 if run:
     run_multiple_sim(n_trial = 200, mult_coherence = [0.0,0.512], start_stim = start_stim, end_stim = end_stim,simtime = simtime)
@@ -28,38 +28,38 @@ if run:
 fig_5a, axes = plt.subplots(1, 2,  figsize=(3,3))
 fig_5b, axesb = plt.subplots(1, 2,  figsize=(3,3))
 n_trial = 200
-mult_coherence = [0.0,0.512]
-win_pop = 'win_B'
+mult_coherence = [0.0,0.032]
+win_pop = 'B_win'
 thr_activity = 15
 
 for i,coherence in enumerate(mult_coherence):
-    B_N_B_mean = np.array([])
-    decision_time = np.array([])
+    B_N_B_mean = []
+    decision_time = []
     dt_string = 'standard/'
     for j in range(n_trial): 
-        path = 'results/'+dt_string+'c'+str(coherence) +'/'+win_pop+ '/trial_'+ str(j)
+        path = 'results/'+dt_string+'c'+str(coherence) +'/'+win_pop+ '/trial_'+ str(j) +'/'
         if os.path.exists(path):
-            notes, evsB, tsB, t, B_N_B, stimulus_B, sum_stimulus_B = extract_results(path, 'B')
-            B_N_B_mean = np.append(B_N_B_mean,B_N_B,axis=0)  
+            evsB, tsB, t, B_N_B, stimulus_B, sum_stimulus_B = extract_results(path, 'B')
+            B_N_B_mean.append(B_N_B)  
             axes[i].plot(t[ind_start_stim:ind_end_stim], B_N_B[ind_start_stim:ind_end_stim], color='black', label ='pop B')
             axes[i].hlines(15, start_stim, end_stim, 'grey')
             axes[i].set_ylim(0,30)
             axes[i].set_ylabel("A(t) [Hz]")
             axes[i].set_xlabel("Time [ms]")
-            decision_time=np.append(decision_time,t[B_N_B >= thr_activity][0], axis=0)  
+            decision_time.append(t[B_N_B >= thr_activity][0])  
 
     axesb[i].hist(decision_time, histtype = 'step', color = 'black', linewidth = 2)
-    axesb[i].set_xlim(0,200)
-    axesb[i].set_ylim(0, n_trial)
+    # axesb[i].set_xlim(0,200)
+    # axesb[i].set_ylim(0, n_trial)
     axesb[i].set_xlabel('Decision time [ms]')
     axesb[i].set_ylabel('Counts #')
 
-    B_N_B_mean = np.mean(B_N_B_mean)
+    B_N_B_mean = np.mean(B_N_B_mean,axis=0)
     axes[i].plot(t[ind_start_stim:ind_end_stim], B_N_B_mean[ind_start_stim:ind_end_stim], color='green', label ='pop B')
             
     if save:
-        fig_5a.savefig('results/'+fig_n+'/Figure5A.eps' , bbox_inches='tight')
-        fig_5b.savefig('results/'+fig_n+'/Figure5B.eps' , bbox_inches='tight')
+        fig_5a.savefig('figures/'+fig_n+'/Figure5A.png' , bbox_inches='tight')
+        fig_5b.savefig('figures/'+fig_n+'/Figure5B.png' , bbox_inches='tight')
         plt.close()
     else:
         plt.show()

@@ -9,13 +9,13 @@ fig_n = 'Figure3'
 run = False
 figure_3a = True
 figure_3b = False
-figure_3c = True
+figure_3c = False
 start_stim = 200.0
 end_stim = 1200.0
 simtime = 2500.0
 
-if not os.path.exists('results/'+fig_n+'/'):
-    os.makedirs('results/'+fig_n+'/')
+if not os.path.exists('figures/'+fig_n+'/'):
+    os.makedirs('figures/'+fig_n+'/')
 
 if run:
     run_multiple_sim(mult_coherence=[0.0], start_stim = start_stim, end_stim = end_stim,simtime = simtime)
@@ -33,10 +33,11 @@ if figure_3a:
     plt.suptitle('Coherence ' + str(coherence*100) + '%')
 
     win_pop = 'A_win'
-    j = 0
-    path = 'results/'+dt_string+'c'+str(coherence) +'/'+win_pop+ '/trial_'+ str(j)
-    notes, evsA, tsA, t, A_N_A, stimulus_A, sum_stimulus_A = extract_results(path, 'A')
-    notes, evsB, tsB, t, B_N_B, stimulus_B, sum_stimulus_B = extract_results(path, 'B')
+    #DA SCEGLIERE
+    j = 1
+    path = 'results/'+dt_string+'c'+str(coherence) +'/'+win_pop+ '/trial_'+ str(j)+'/'
+    evsA, tsA, t, A_N_A, stimulus_A, sum_stimulus_A = extract_results(path, 'A')
+    evsB, tsB, t, B_N_B, stimulus_B, sum_stimulus_B = extract_results(path, 'B')
     ax_raster_A.scatter(tsA, evsA,marker = '|', linewidths = 0.8, color='red', label ='pop A')
     ax_raster_A.scatter(tsB, evsB,marker = '|', linewidths = 0.8, color='blue', label ='pop B')
     ax_raster_A.vlines(start_stim, 0, 1600, color='grey')
@@ -65,10 +66,11 @@ if figure_3a:
     plt.xlabel("t [ms]")
 
     win_pop = 'B_win'
-    j = 1
-    path = 'results/'+dt_string+'c'+str(coherence) +'/'+win_pop+ '/trial_'+ str(j)
-    notes, evsA, tsA, t, A_N_A, stimulus_A, sum_stimulus_A = extract_results(path, 'A')
-    notes, evsB, tsB, t, B_N_B, stimulus_B, sum_stimulus_B = extract_results(path,'B')
+    #DA SCEGLIERE
+    j = 0
+    path = 'results/'+dt_string+'c'+str(coherence) +'/'+win_pop+ '/trial_'+ str(j)+'/'
+    evsA, tsA, t, A_N_A, stimulus_A, sum_stimulus_A = extract_results(path, 'A')
+    evsB, tsB, t, B_N_B, stimulus_B, sum_stimulus_B = extract_results(path,'B')
     ax_raster_B.scatter(tsA, evsA,marker = '|', linewidths = 0.8, color='red', label ='pop A')
     ax_raster_B.scatter(tsB, evsB,marker = '|', linewidths = 0.8, color='blue', label ='pop B')
     ax_raster_B.vlines(start_stim, 0, 1600, color='grey')
@@ -97,7 +99,7 @@ if figure_3a:
     #ax_sum_stimuli_B.legend()
     plt.xlabel("t [ms]")
     if save:
-        fig.savefig('results/'+fig_n+'/Figure3A.eps' , bbox_inches='tight')
+        fig.savefig('figures/'+fig_n+'/Figure3A.png' , bbox_inches='tight')
         plt.close()
     else:
         plt.show()
@@ -106,35 +108,36 @@ if figure_3b:
     fig, dec_space = plt.subplots(1, 1,  figsize=(3,3))
     dt_string = 'standard/'
     n_trial = 200
-    coherence = 0
+    coherence = 0.0
     win_pop = 'A_win'
-    A_N_A_mean = np.array([])
-    B_N_B_mean = np.array([])
+    A_N_A_mean = []
+    B_N_B_mean = []
     for j in range(n_trial): 
-        path = 'results/'+dt_string+'c'+str(coherence) +'/'+win_pop+ '/trial_'+ str(j)
+        path = 'results/'+dt_string+'c'+str(coherence) +'/'+win_pop+ '/trial_'+ str(j)+'/'
         if os.path.exists(path):
-            notes, evsA, tsA, t, A_N_A, stimulus_A, sum_stimulus_A = extract_results(path, 'A')
-            notes, evsB, tsB, t, B_N_B, stimulus_B, sum_stimulus_B = extract_results(path, 'B')
-            A_N_A_mean = np.append(A_N_A_mean,A_N_A)
-            B_N_B_mean = np.append(B_N_B_mean,B_N_B)
-    A_N_A_mean = np.mean(A_N_A_mean)
-    B_N_B_mean = np.mean(B_N_B_mean)
-    dec_space.plot(A_N_A,B_N_B, color='red', label ='coh_' + '0-'+ str(coherence)[2:])
+            evsA, tsA, t, A_N_A, stimulus_A, sum_stimulus_A = extract_results(path, 'A')
+            evsB, tsB, t, B_N_B, stimulus_B, sum_stimulus_B = extract_results(path, 'B')
+            A_N_A_mean.append(A_N_A)
+            B_N_B_mean.append(B_N_B)
+
+    A_N_A_mean = np.mean(A_N_A_mean,axis=0)
+    B_N_B_mean = np.mean(B_N_B_mean,axis=0)
+    dec_space.plot(A_N_A,B_N_B, color='red', label ='pop A wins')
 
     win_pop = 'B_win'
-    A_N_A_mean = np.array([])
-    B_N_B_mean = np.array([])
+    A_N_A_mean = []
+    B_N_B_mean = []
     for j in range(n_trial): 
-        path = 'results/'+dt_string+'c'+str(coherence) +'/'+win_pop+ '/trial_'+ str(j)
+        path = 'results/'+dt_string+'c'+str(coherence) +'/'+win_pop+ '/trial_'+ str(j)+'/'
         if os.path.exists(path):
-            notes, evsA, tsA, t, A_N_A, stimulus_A, sum_stimulus_A = extract_results(path, 'A')
-            notes, evsB, tsB, t, B_N_B, stimulus_B, sum_stimulus_B = extract_results(path, 'B')
-            A_N_A_mean = np.append(A_N_A_mean,A_N_A)
-            B_N_B_mean = np.append(B_N_B_mean,B_N_B)
-    A_N_A_mean = np.mean(A_N_A_mean)
-    B_N_B_mean = np.mean(B_N_B_mean)
-    dec_space.plot(A_N_A,B_N_B, color='blue', label ='coh_' + '0-'+ str(coherence)[2:])
-
+            evsA, tsA, t, A_N_A, stimulus_A, sum_stimulus_A = extract_results(path, 'A')
+            evsB, tsB, t, B_N_B, stimulus_B, sum_stimulus_B = extract_results(path, 'B')
+            A_N_A_mean.append(A_N_A)
+            B_N_B_mean.append(B_N_B)
+    A_N_A_mean = np.mean(A_N_A_mean,axis=0)
+    B_N_B_mean = np.mean(B_N_B_mean,axis=0)
+    dec_space.plot(A_N_A,B_N_B, color='blue', label ='pop B wins')
+    dec_space.plot([0,40],[0,40], color='grey')
     dec_space.set_xlim(-0.1,40)
     dec_space.set_ylim(-0.1,40)
     dec_space.set_xlabel("Firing rate pop A (Hz)")
@@ -142,7 +145,7 @@ if figure_3b:
     dec_space.set_title("Decision Space")
     dec_space.legend()
     if save:
-        fig.savefig('results/'+fig_n+'/Figure3B.eps' , bbox_inches='tight')
+        fig.savefig('figures/'+fig_n+'/Figure3B.png' , bbox_inches='tight')
         plt.close()
     else:
         plt.show()
@@ -152,11 +155,13 @@ if figure_3c:
     delta_s_A_winner = np.array([])
     delta_s_B_winner = np.array([])
     coherence = 0.0
-    dt_string = 'prova'
+    dt_string = 'standard/'
     results_dir= 'results/'+dt_string
 
     delta_s_A_winner=pd.read_csv(results_dir+'c'+str(coherence) +'/delta_s_A_winner.csv')
     delta_s_B_winner=pd.read_csv(results_dir+'c'+str(coherence) +'/delta_s_B_winner.csv')
+    delta_s_A_winner=delta_s_A_winner['delta_s_A_winner'].to_numpy()
+    delta_s_B_winner=delta_s_B_winner['delta_s_B_winner'].to_numpy()
     
     fig, ax1 = plt.subplots(1,1,figsize = [5,5])          
     ax1.hist(delta_s_A_winner, histtype = 'step', color = 'red', linewidth = 2)
@@ -165,7 +170,7 @@ if figure_3c:
     ax1.set_ylabel('Count #')
 
     if save:
-        fig.savefig('results/'+fig_n+'/Figure3C.eps' , bbox_inches='tight')
+        fig.savefig('figures/'+fig_n+'/Figure3C.png' , bbox_inches='tight')
         plt.close()
     else:
         plt.show()

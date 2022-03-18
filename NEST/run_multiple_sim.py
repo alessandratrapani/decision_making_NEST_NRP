@@ -106,7 +106,7 @@ def run_multiple_sim(results_dir = 'results/standard/',
             events_A.to_csv(saving_dir+'events_pop_A.csv')
             events_B.to_csv(saving_dir+'events_pop_B.csv')
             frequency.to_csv(saving_dir+'frequency.csv')
-            events_inh.to_csv(saving_dir+'_events_pop_inh.csv')
+            events_inh.to_csv(saving_dir+'events_pop_inh.csv')
             stimuli.to_csv(saving_dir+'stimuli.csv')
 
         delta_s_A_winner = {'delta_s_A_winner':delta_s_A_winner}

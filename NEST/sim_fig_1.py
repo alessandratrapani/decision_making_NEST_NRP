@@ -13,15 +13,12 @@ end_stim = 1200.0
 dt = 0.1
 dt_rec = 10.0
 
-save = False
-
 figure1abc = True
-figure1ed = True
+figure1ed = False
 
 fig_n = 'Figure1'
-if not os.path.exists('results/'+fig_n+'/'):
-    os.makedirs('results/'+fig_n+'/')
-
+if not os.path.exists('figures/'+fig_n+'/'):
+    os.makedirs('figures/'+fig_n+'/')
 
 if run_1:
     run_multiple_sim(n_trial = 200)
@@ -29,17 +26,21 @@ if run_1:
 if figure1abc:
     fig1a,axes = plt.subplots(6, 2,  figsize=(5,10))
     fig1d,ax = plt.subplots(1, 1,  figsize=(3,3))
-    mult_coherence = [0.0,0.128,0.512]
+    fig1e,ax1e = plt.subplots(1, 1,  figsize=(3,3))
+    mult_coherence = [0.0,-0.128,-0.512]
+    #DA SETTARE
+    trial = [0,0,1]
     for i, coherence in enumerate(mult_coherence):
-        j = 0
-        win_pop = 'win_B'
+        j = trial[i]
+        win_pop = 'A_win'
         results_dir = 'results/standard/'
-        path = results_dir+'c'+str(coherence) +'/'+win_pop+ '/trial_'+ str(j)
-        notes, evsA, tsA, t, A_N_A, stimulus_A, sum_stimulus_A = extract_results(path, 'A')
-        notes, evsB, tsB, t, B_N_B, stimulus_B, sum_stimulus_B = extract_results(path, 'B')
-        notes, evsA, tsA, t, I_N_I, stimulus_A, sum_stimulus_A = extract_results(path, 'inh')
+        path = results_dir+'c'+str(coherence) +'/'+win_pop+ '/trial_'+ str(j)+'/'
+        evsA, tsA, t, A_N_A, stimulus_A, sum_stimulus_A = extract_results(path, 'A')
+        evsB, tsB, t, B_N_B, stimulus_B, sum_stimulus_B = extract_results(path, 'B')
+        evsIn, tsIn, t, I_N_I, stimulus_A, sum_stimulus_A = extract_results(path, 'inh')
         
-        ax.plot(t, I_N_I, color='black',alpha=1-i*0.1, label ='coh_' + '0-'+ str(coherence)[2:])
+        ax.plot(t[:120], I_N_I[:120], alpha= 0.9, label ='c '+str(coherence*100)+'%')
+        ax1e.plot(A_N_A,B_N_B,color=[0.4+i*0.2,0,0], alpha= 0.7, label ='c '+str(coherence*100)+'%')
 
         axes[2*i][0].scatter(tsA, evsA,marker = '|', linewidths = 0.8, color='red', label ='pop A')
         axes[2*i][0].set_ylabel("neuron #")
@@ -70,43 +71,52 @@ if figure1abc:
     ax.set_title("Activity Pop Inh", fontsize=10)
     ax.legend()
 
-    fig1a.savefig('results/'+fig_n+'/Figure1a.eps', bbox_inches='tight')
-    fig1d.savefig('results/'+fig_n+'/Figure1d.eps', bbox_inches='tight')
+    ax1e.set_xlim(-0.1,40)
+    ax1e.set_ylim(-0.1,40)
+    ax1e.set_xlabel("Firing rate pop A (Hz)")
+    ax1e.set_ylabel("Firing rate pop B (Hz)")
+    ax1e.set_title("Decision Space")
+    ax1e.legend()
+    fig1e.savefig('figures/'+fig_n+'/Figure1e.png', bbox_inches='tight')
+
+    fig1a.savefig('figures/'+fig_n+'/Figure1a.png', bbox_inches='tight')
+    fig1d.savefig('figures/'+fig_n+'/Figure1d.png', bbox_inches='tight')
 
 if figure1ed:
 
     fig_1d, ax_rate_in = plt.subplots(1, 1,  figsize=(3,3))
     fig_1e, dec_space = plt.subplots(1, 1,  figsize=(3,3))
-    mult_coherence = [0.0, 0.128, 0.512]
+    mult_coherence = [0.0, -0.032, 0.032]
     n_trial = 200
-    win_pop = 'win_B'
+    win_pop = 'B_win'
     for i,coherence in enumerate(mult_coherence):
-        A_N_A_mean = np.array([])
-        B_N_B_mean = np.array([])
-        I_N_I_mean = np.array([])
+        A_N_A_mean = []
+        B_N_B_mean = []
+        I_N_I_mean = []
         for j in range(n_trial):  
             results_dir = 'results/standard/'
-            path = results_dir+'c'+str(coherence) +'/'+win_pop+ '/trial_'+ str(j)
+            path = results_dir+'c'+str(coherence) +'/'+win_pop+ '/trial_'+ str(j)+'/'
             if os.path.exists(path):
-                activity = pd.read_csv(path)
-                A_N_A = activity['activity (Hz) pop_A'].to_numpy()
-                A_N_A_mean = np.append(A_N_A_mean,A_N_A,axis=0)
-                B_N_B = activity['activity (Hz) pop_B'].to_numpy()
-                B_N_B_mean = np.append(B_N_B_mean,B_N_B,axis=0)
-                I_N_I = activity['activity (Hz) pop_inh'].to_numpy()
-                I_N_I_mean = np.append(I_N_I_mean,I_N_I,axis=0)
+                evsA, tsA, t, A_N_A, stimulus_A, sum_stimulus_A = extract_results(path, 'A')
+                evsB, tsB, t, B_N_B, stimulus_B, sum_stimulus_B = extract_results(path, 'B')
+                evsIn, tsIn, t, I_N_I, stimulus_A, sum_stimulus_A = extract_results(path, 'inh')
+                
+                A_N_A_mean.append(A_N_A)
+                B_N_B_mean.append(B_N_B)
+                I_N_I_mean.append(I_N_I)
 
-        A_N_A_mean = np.mean(A_N_A_mean)
-        B_N_B_mean = np.mean(B_N_B_mean)
-        I_N_I_mean = np.mean(I_N_I_mean)
+        
+        A_N_A_mean = np.mean(A_N_A_mean,axis=0)
+        B_N_B_mean = np.mean(B_N_B_mean,axis=0)
+        I_N_I_mean = np.mean(I_N_I_mean,axis=0)
 
-        dec_space.plot(A_N_A_mean,B_N_B_mean, color='blue', alpha=1-i*0.1, label ='coh_' + '0-'+ str(coherence)[2:])
-        ax_rate_in.plot(t,I_N_I_mean, color='black', alpha=1-i*0.1, label ='coh_' + '0-'+ str(coherence)[2:])
+        dec_space.plot(A_N_A_mean,B_N_B_mean, label ='c '+str(coherence*100)+'%')
+        ax_rate_in.plot(I_N_I_mean,  label ='c '+str(coherence*100)+'%')
 
     ax_rate_in.set_ylabel("A(t) [Hz]")
     ax_rate_in.set_title("Activity Pop Inh", fontsize=10)
     ax_rate_in.legend()
-    fig1a.savefig('results/'+fig_n+'/Figure1d_mean.eps', bbox_inches='tight')
+    fig_1d.savefig('figures/'+fig_n+'/Figure1d_mean.png', bbox_inches='tight')
     
     dec_space.set_xlim(-0.1,40)
     dec_space.set_ylim(-0.1,40)
@@ -114,4 +124,4 @@ if figure1ed:
     dec_space.set_ylabel("Firing rate pop B (Hz)")
     dec_space.set_title("Decision Space")
     dec_space.legend()
-    fig_1e.savefig('results/'+fig_n+'/Figure1e.eps', bbox_inches='tight')
+    fig_1e.savefig('figures/'+fig_n+'/Figure1e_mean.png', bbox_inches='tight')
