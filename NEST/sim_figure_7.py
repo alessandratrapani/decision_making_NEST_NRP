@@ -14,14 +14,14 @@ import os
 fig_n = 'Figure7'
 run_t_reverse = False
 run_stim_reverse = False
-save = False
+save = True
 
 if not os.path.exists('figures/'+fig_n+'/'):
     os.makedirs('figures/'+fig_n+'/')
 
 dt = 0.1
 dt_rec = 10.0
-n_trial = 1
+n_trial = 50
 start_stim = 200.0
 simtime = 2500.0
 order = 400
@@ -30,8 +30,8 @@ fn_fixed_par = "fixed_parameters.csv"
 fn_tuned_par = "tuned_parameters.csv"
 rec_pop=1.
 
-figure7a = False
-figure7b = False
+figure7a = True
+figure7b = True
 figure7c = True
 
 if run_t_reverse:
@@ -243,29 +243,26 @@ if run_stim_reverse:
     sim_info.to_csv(results_dir+'sim_info.csv')
 
 if figure7a:
-    save=False
     dt_string = 'prova'
     results_dir = 'results/t_reverse/'
     winner = pd.read_csv(results_dir+'winners.csv')
-    n_trial=1
     
     coherence_level = winner['t_rev'].to_numpy()
     pop_A_win = 100*(winner['pop A win'].to_numpy())/n_trial
     pop_B_win = 100*(winner['pop B win'].to_numpy())/n_trial
 
-    fig, ax1 = plt.subplots(1,1,figsize = [5,5])
-    ax1.plot(coherence_level,pop_A_win,'*', color='red')
-    ax1.plot(coherence_level,pop_B_win,'*', color='blue')
-    ax1.set_xlabel('Coherence level %')
+    fig, ax1 = plt.subplots(1,1,figsize = [5,5],sharey=True,sharex=True,constrained_layout=True)
+    ax1.plot(coherence_level,pop_A_win,'o-', color='red')
+    ax1.plot(coherence_level,pop_B_win,'o-', color='blue')
+    ax1.set_xlabel('Time Reverse [ms]')
     ax1.set_ylabel('%\ of correct choice')
     if save:
-        fig.savefig('figures/'+fig_n+'/Figure7A.eps' , bbox_inches='tight')
+        fig.savefig('figures/'+fig_n+'/Figure7A.png' , bbox_inches='tight')
         plt.close()
     else:
         plt.show()
 
 if figure7b:
-    save=False
     dt_string = 'prova'
     results_dir = 'results/stim_reverse/'
     winner = pd.read_csv(results_dir+'winners.csv')
@@ -275,18 +272,18 @@ if figure7b:
     pop_B_win = 100*(winner['pop B win'].to_numpy())/n_trial
 
     fig, ax1 = plt.subplots(1,1,figsize = [5,5])
-    ax1.plot(coherence_level,pop_A_win,'*', color='red')
-    ax1.plot(coherence_level,pop_B_win,'*', color='blue')
-    ax1.set_xlabel('Coherence level %')
+    ax1.plot(coherence_level,pop_A_win,'s-', color='red')
+    ax1.plot(coherence_level,pop_B_win,'s-', color='blue')
+    ax1.set_xlabel('Coherence level % Stimulu Reverse')
     ax1.set_ylabel('%\ of correct choice')
     if save:
-        fig.savefig('figures/'+fig_n+'/Figure7B.eps' , bbox_inches='tight')
+        fig.savefig('figures/'+fig_n+'/Figure7B.png' , bbox_inches='tight')
         plt.close()
     else:
         plt.show()
 
 if figure7c:
-    fig,axes = plt.subplots(2,2,figsize = [16,10])
+    fig,axes = plt.subplots(2,2,figsize = [10,10],sharey='row',sharex='row',constrained_layout=True)
     stim_rev=-0.8
     dt_string = 'standard/'
     coherence = 0.128
@@ -333,8 +330,12 @@ if figure7c:
     axes[0][1].plot(t,A_N_A_mean,'red')
     axes[1][1].plot(np.arange(0., simtime),stimulus_B,'blue')
     axes[1][1].plot(np.arange(0., simtime),stimulus_A,'red')
+    axes[0][0].set_ylabel("A(t) [Hz]")
+    axes[1][0].set_ylabel("S(t) [Hz]")
+    axes[1][0].set_xlabel("Time [ms]")
+    axes[1][1].set_xlabel("Time [ms]")
     if save:
-        fig.savefig('figures/'+fig_n+'/Figure7C.eps' , bbox_inches='tight')
+        fig.savefig('figures/'+fig_n+'/Figure7C.png' , bbox_inches='tight')
         plt.close()
     else:
         plt.show()

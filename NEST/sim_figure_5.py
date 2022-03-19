@@ -26,9 +26,9 @@ if run:
     run_multiple_sim(n_trial = 200, mult_coherence = [0.0,0.512], start_stim = start_stim, end_stim = end_stim,simtime = simtime)
 
 
-fig_5a, axes = plt.subplots(1, 2,  figsize=(3,3))
-fig_5b, axesb = plt.subplots(1, 1,  figsize=(3,3))
-n_trial = 200
+fig_5a, axes = plt.subplots(1, 2,  figsize=(3,3),sharey=True,sharex=True,constrained_layout=True)
+fig_5b, axesb = plt.subplots(1, 1,  figsize=(3,3),sharey=True,sharex=True,constrained_layout=True)
+n_trial = 20
 mult_coherence = [0.0,0.512]
 win_pop = 'B_win'
 thr_activity = 15
@@ -46,9 +46,10 @@ for i,coherence in enumerate(mult_coherence):
             axes[i].plot(t[ind_start_stim:ind_end_stim], B_N_B[ind_start_stim:ind_end_stim], color='black', label ='pop B')
             axes[i].hlines(15, start_stim, end_stim, 'grey')
             axes[i].set_ylim(0,30)
-            axes[i].set_ylabel("A(t) [Hz]")
             axes[i].set_xlabel("Time [ms]")
-            decision_time.append(t[B_N_B >= thr_activity][0])  
+            if len(t[B_N_B >= thr_activity])!=0:
+                decision_time.append(t[B_N_B >= thr_activity][0])  
+    axes[0].set_ylabel("A(t) [Hz]")
 
     axesb.hist(decision_time, color = [0.5-i*0.3,0.4-i*0.3,0.5-i*0.3], linewidth = 2)
 

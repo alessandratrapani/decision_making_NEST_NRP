@@ -17,11 +17,13 @@ import scipy.signal as signal
 # \\c 6.4, 
 # \\c 12.8
 # \\c 25.6 
+def weib(c,alpha,beta):
+    return 1-0.5*np.exp(-(c/alpha)**beta)
 
 fig_n = 'Figure4'
 
-figure_4a = False
-figure_4b = True
+figure_4a = True
+figure_4b = False
 start_stim = 200.0
 end_stim = 1200.0
 simtime = 2500.0
@@ -41,13 +43,17 @@ if figure_4a:
     winner = pd.read_csv(results_dir+dt_string+'_winners.csv')
     n_trial=1000
     
-    coherence_level = [3.2,6.4,12.8,25.6,51.2,100.]
+    coherence_level = np.array([3.2,6.4,12.8,25.6,51.2,100.])
     pop_A_win = 100*(winner['pop A win'].to_numpy())/n_trial
     pop_B_win = 100*(winner['pop B win'].to_numpy())/n_trial
-
-    fig, ax1 = plt.subplots(1,1,figsize = [5,5])
+    c=np.linspace(3.2,100.,100)
+    fit_weibul=weib(c,9.2,1.8)
+    point_weibul=weib(coherence_level,9.2,1.8)
+    fig, ax1 = plt.subplots(1,1,figsize = [5,5],constrained_layout=True)
     ax1.semilogx(coherence_level,pop_A_win[8:],'s-', color='red')
     ax1.semilogx(coherence_level,pop_B_win[:6],'o-', color='blue')
+    ax1.semilogx(c,fit_weibul*100,color='black')
+    ax1.semilogx(coherence_level,point_weibul*100,'*',color='black')
     ax1.set_xlim(2*1e0, 2*1e2)
     ax1.set_xlabel('Coherence level %')
     ax1.set_ylabel('%\ of correct choice')
@@ -62,7 +68,7 @@ if run_1:
     run_multiple_sim(n_trial = 50, mult_coherence = [0.032,0.064,0.128,0.256,0.032,-0.064,-0.128,-0.256], start_stim = start_stim, end_stim = end_stim,simtime = simtime)
 
 if figure_4b:
-    fig,ax4b = plt.subplots(4,1,figsize = [5,10])
+    fig,ax4b = plt.subplots(4,1,figsize = [5,10],sharey=True,sharex=True,constrained_layout=True)
     dt_string = 'standard/'
     #DA SETTARE
     mult_coherence = [0.0,0.032, 0.064, 0.128]
@@ -124,9 +130,9 @@ if figure_4b:
         mean_activity_wA_sA = signal.medfilt(mean_activity_wA_sA,35)
         
         ax4b[i].plot(t[0:120],mean_activity_wB_sA[0:120],'black', '--',alpha=0.6)
-        ax4b[i].plot(t[0:120],mean_activity_wA_sA[0:120],'orange')
-    
+        ax4b[i].plot(t[0:120],mean_activity_wA_sA[0:120],'orange')    
         ax4b[i].set_ylim(0,40)
+
     if save:
         fig.savefig('figures/'+fig_n+'/Figure4B.png' , bbox_inches='tight')
         plt.close()

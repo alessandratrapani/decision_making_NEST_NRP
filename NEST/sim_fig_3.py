@@ -8,11 +8,12 @@ import os
 fig_n = 'Figure3'
 run = False
 figure_3a = True
-figure_3b = True
-figure_3c = True
+figure_3b = False
+figure_3c = False
 start_stim = 200.0
 end_stim = 1200.0
 simtime = 2500.0
+save=True
 
 if not os.path.exists('figures/'+fig_n+'/'):
     os.makedirs('figures/'+fig_n+'/')
@@ -62,6 +63,7 @@ if figure_3a:
     ax_sum_stimuli_A.plot(np.arange(0., simtime),sum_stimulus_A, 'red', label='sum_stimulus on A')
     ax_sum_stimuli_A.plot(np.arange(0., simtime),sum_stimulus_B, 'blue', label='sum_stimulus on B')
     ax_sum_stimuli_A.set_title("Time integral of inputs", fontsize=10)
+    ax_sum_stimuli_A.set_yticks([])
     #ax_sum_stimuli_A.legend()
     plt.xlabel("t [ms]")
 
@@ -95,6 +97,7 @@ if figure_3a:
     ax_sum_stimuli_B.plot(np.arange(0., simtime),sum_stimulus_A, 'red', label='sum_stimulus on A')
     ax_sum_stimuli_B.plot(np.arange(0., simtime),sum_stimulus_B, 'blue', label='sum_stimulus on B')
     ax_sum_stimuli_B.set_title("Time integral of inputs", fontsize=10)
+    ax_sum_stimuli_B.set_yticks([])
     
     #ax_sum_stimuli_B.legend()
     plt.xlabel("t [ms]")
@@ -105,14 +108,14 @@ if figure_3a:
         plt.show()
 
 if figure_3b:
-    fig, dec_space = plt.subplots(1, 1,  figsize=(3,3))
+    fig, dec_space = plt.subplots(1, 1,  figsize=(5,5))
     dt_string = 'standard/'
-    n_trial = 200
+    n_trial = [158,146]
     coherence = 0.0
     win_pop = 'A_win'
     A_N_A_mean = []
     B_N_B_mean = []
-    for j in range(n_trial): 
+    for j in n_trial: 
         path = 'results/'+dt_string+'c'+str(coherence) +'/'+win_pop+ '/trial_'+ str(j)+'/'
         if os.path.exists(path):
             evsA, tsA, t, A_N_A, stimulus_A, sum_stimulus_A = extract_results(path, 'A')
@@ -127,7 +130,7 @@ if figure_3b:
     win_pop = 'B_win'
     A_N_A_mean = []
     B_N_B_mean = []
-    for j in range(n_trial): 
+    for j in n_trial: 
         path = 'results/'+dt_string+'c'+str(coherence) +'/'+win_pop+ '/trial_'+ str(j)+'/'
         if os.path.exists(path):
             evsA, tsA, t, A_N_A, stimulus_A, sum_stimulus_A = extract_results(path, 'A')
