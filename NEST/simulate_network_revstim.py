@@ -178,43 +178,22 @@ def simulate_network_revstim(t_rev=1000., stim_rev=-0.8, n_run=1,coherence = 51.
             rate_B = (max(0., rate_B)) #no negative rate
             rate_A = np.random.normal(offset_A, std_p_rate_stimulus)
             rate_A = (max(0., rate_A)) #no negative rate
-            
-            #ZERO VARIABILITY (TODO 5)
-            #rate_A = mean_p_rate_stimulus   
-            #rate_B = mean_p_rate_stimulus
-            
-            nest.SetStatus(PG_input_AMPA_A, "rate", rate_A)
-            nest.SetStatus(PG_input_AMPA_B, "rate", rate_B)
-            print("stim on. rate_A={}, rate_B={}".format(rate_A, rate_B))
-            print('trial number {}'.format(n_run))
 
         elif t >= t_rev  and t < end_stim:
             offset_A = mean_p_rate_stimulus * (0.5 - (0.5 * stim_rev))
             offset_B = mean_p_rate_stimulus * (0.5 + (0.5 * stim_rev))
-
             rate_B = np.random.normal(offset_B, std_p_rate_stimulus)
             rate_B = (max(0., rate_B)) #no negative rate
             rate_A = np.random.normal(offset_A, std_p_rate_stimulus)
             rate_A = (max(0., rate_A)) #no negative rate
             
-            #ZERO VARIABILITY (TODO 5)
-            #rate_A = mean_p_rate_stimulus   
-            #rate_B = mean_p_rate_stimulus
-            
-            nest.SetStatus(PG_input_AMPA_A, "rate", rate_A)
-            nest.SetStatus(PG_input_AMPA_B, "rate", rate_B)
-            print("stim on. rate_A={}, rate_B={}".format(rate_A, rate_B))
-            print('trial number {}'.format(n_run))
-            
         else:
-            nest.SetStatus(PG_input_AMPA_A, "rate", 0.)
-            nest.SetStatus(PG_input_AMPA_B, "rate", 0.)
-
             rate_A = 0.0
             rate_B = 0.0
-            print("stim off.")
-            print('trial number {}'.format(n_run))
-        
+
+        nest.SetStatus(PG_input_AMPA_A, "rate", rate_A)
+        nest.SetStatus(PG_input_AMPA_B, "rate", rate_B)
+
         return rate_A, rate_B, rate_noise_A, rate_noise_B
 
     #'''
