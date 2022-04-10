@@ -525,7 +525,8 @@ MigrationBackup/
 
 #Folders
 NEST/old/
-NEST/results/
+NEST/results_new/
+NEST/figures/
 /home/amtra/Desktop/decision_making_NEST_NRP/decision_making_NEST_NRP/NEST/Excitatory population A-1007-0.gdf
 /home/amtra/Desktop/decision_making_NEST_NRP/decision_making_NEST_NRP/NEST/Excitatory population B-1008-0.gdf
 /home/amtra/Desktop/decision_making_NEST_NRP/decision_making_NEST_NRP/NEST/Inhibitory population -1009-0.gdf
