@@ -1,1 +1,2 @@
-decision_making_NEST_NRP
+# Decision-making spiking neural network on NEST
+

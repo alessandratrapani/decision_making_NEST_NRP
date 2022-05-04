@@ -521,12 +521,3 @@ MigrationBackup/
 .ionide/
 
 # End of https://www.toptal.com/developers/gitignore/api/vs,jupyternotebooks,python
-
-
-#Folders
-NEST/old/
-NEST/results_new/
-NEST/figures/
-/home/amtra/Desktop/decision_making_NEST_NRP/decision_making_NEST_NRP/NEST/Excitatory population A-1007-0.gdf
-/home/amtra/Desktop/decision_making_NEST_NRP/decision_making_NEST_NRP/NEST/Excitatory population B-1008-0.gdf
-/home/amtra/Desktop/decision_making_NEST_NRP/decision_making_NEST_NRP/NEST/Inhibitory population -1009-0.gdf
